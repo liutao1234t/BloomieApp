@@ -1,0 +1,235 @@
+{
+  "app_identity": {
+    "name": "Bloomie",
+    "edition": {
+      "platform": "iOS",
+      "release": "1.0.0"
+    }
+  },
+  "daily_greeting": {
+    "period": "renjiniqunaer",
+    "copy": {
+      "headline": "Ready to grow something beautiful?",
+      "tone": "warm"
+    }
+  },
+  "daily_focus": {
+    "theme": "Wildflower Whimsy",
+    "details": {
+      "summary": "Daisies and field poppies for a sun-drenched mood.",
+      "accent": "cheerful"
+    }
+  },
+  "seasonal_collection": {
+    "season": "spring",
+    "items": {
+      "featured": 4,
+      "palette": [
+        "blush",
+        "lilac",
+        "butter"
+      ]
+    }
+  },
+  "flower_catalog": {
+    "count": 24,
+    "taxonomy": {
+      "families": [
+        "rose",
+        "peony",
+        "tulip"
+      ],
+      "difficulty": "mixed"
+    }
+  },
+  "featured_bloom": {
+    "name": "Pastel Tulips",
+    "care": {
+      "light": "bright indirect",
+      "water": "moderate"
+    }
+  },
+  "inspiration_feed": {
+    "layout": "masonry",
+    "metrics": {
+      "visible_cards": 5,
+      "freshness": "today"
+    }
+  },
+  "creator_spotlight": {
+    "name": "Elena",
+    "profile": {
+      "specialty": "romantic bouquets",
+      "availability": "online"
+    }
+  },
+  "creator_circle": {
+    "total": 5,
+    "members": {
+      "names": [
+        "Elena",
+        "Marcus",
+        "Rose",
+        "Arlo",
+        "Mina"
+      ],
+      "active": 3
+    }
+  },
+  "saved_inspirations": {
+    "total": 7,
+    "folders": {
+      "spring": 4,
+      "gifts": 3
+    }
+  },
+  "favorite_blooms": {
+    "total": 12,
+    "latest": {
+      "name": "Sweet Lilac",
+      "added_at": "2026-07-21T08:45:00Z"
+    }
+  },
+  "bouquet_gallery": {
+    "featured": "Pink Dreamscape",
+    "engagement": {
+      "views": 1200,
+      "likes": 2400
+    }
+  },
+  "bouquet_palette": {
+    "primary": "blush pink",
+    "accents": {
+      "colors": [
+        "ivory",
+        "sage"
+      ],
+      "contrast": "soft"
+    }
+  },
+  "bouquet_recipe": {
+    "style": "garden gathered",
+    "steps": {
+      "count": 5,
+      "first": "Prepare stems"
+    }
+  },
+  "care_schedule": {
+    "plant": "Peony",
+    "routine": {
+      "watering": "weekly",
+      "feeding": "early spring"
+    }
+  },
+  "pet_safety": {
+    "plant": "Peony",
+    "guidance": {
+      "cats": "avoid ingestion",
+      "action": "consult a veterinarian"
+    }
+  },
+  "ai_florist": {
+    "name": "Bloomie",
+    "status": {
+      "presence": "online",
+      "specialty": "floral guidance"
+    }
+  },
+  "ai_conversation": {
+    "topic": "Peony care",
+    "session": {
+      "message_count": 4,
+      "started_at": "2026-07-21T10:24:00Z"
+    }
+  },
+  "suggested_prompts": {
+    "count": 2,
+    "items": {
+      "first": "Cat-safe flowers?",
+      "second": "Create a care guide"
+    }
+  },
+  "coin_wallet": {
+    "balance": 1250,
+    "usage": {
+      "message_cost": 8,
+      "currency": "coins"
+    }
+  },
+  "creator_chat": {
+    "participant": "Elena",
+    "thread": {
+      "topic": "Vibrant bouquet",
+      "unread": 0
+    }
+  },
+  "message_attachment": {
+    "kind": "bouquet image",
+    "asset": {
+      "caption": "Pink roses with eucalyptus",
+      "state": "ready"
+    }
+  },
+  "discovery_filters": {
+    "occasion": "any",
+    "choices": {
+      "colors": [
+        "pink",
+        "yellow"
+      ],
+      "style": "vibrant"
+    }
+  },
+  "search_preferences": {
+    "query": "spring flowers",
+    "scope": {
+      "content": [
+        "blooms",
+        "creators"
+      ],
+      "sort": "relevance"
+    }
+  },
+  "notification_preferences": {
+    "enabled": true,
+    "channels": {
+      "in_app": true,
+      "email": false
+    }
+  },
+  "profile_settings": {
+    "display_name": "Mia",
+    "preferences": {
+      "language": "en",
+      "time_zone": "Asia/Shanghai"
+    }
+  },
+  "accessibility": {
+    "text_scale": "standard",
+    "options": {
+      "reduce_motion": false,
+      "high_contrast": false
+    }
+  },
+  "content_localization": {
+    "language": "en",
+    "formats": {
+      "date": "MMM d",
+      "time": "h:mm a"
+    }
+  },
+  "safety_resources": {
+    "topic": "plant exposure",
+    "contacts": {
+      "primary": "local veterinarian",
+      "urgent": "regional poison center"
+    }
+  },
+  "support_center": {
+    "email": "support@bloomie.work",
+    "service": {
+      "category": "account help",
+      "response_target_hours": 48
+    }
+  }
+}
