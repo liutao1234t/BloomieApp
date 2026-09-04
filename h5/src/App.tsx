@@ -20,8 +20,10 @@ export function App() {
     startIncomingCallDispatch();
   }, []);
 
+  const routerBasename = import.meta.env.BASE_URL.replace(/\/$/, "") || undefined;
+
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={routerBasename}>
       <div className="app-root">
         <NavStage />
         <IncomingCallLayer />
