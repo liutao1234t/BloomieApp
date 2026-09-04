@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { StackBar } from "../shells/StackBar";
 import { StackShell } from "../shells/Shells";
 import { useAppStore } from "../store/appStore";
+import { publicUrl } from "../lib/publicUrl";
 
 export function SettingsPage() {
   const navigate = useNavigate();
@@ -15,23 +16,23 @@ export function SettingsPage() {
           <button className="stk-row press" type="button" onClick={() => navigate("/settings/profile")}>
             <span className="stk-ico">
               <span className="icon-box" style={{ width: 16, height: 16 }}>
-                <img className="icon" src="/icons/row-profile.svg" alt="" />
+                <img className="icon" src={publicUrl("/icons/row-profile.svg")} alt="" />
               </span>
             </span>
             Edit Profile
             <span className="icon-box chevron" style={{ width: 8, height: 12 }}>
-              <img className="icon" src="/icons/chevron.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/chevron.svg")} alt="" />
             </span>
           </button>
           <button className="stk-row press" type="button" onClick={() => navigate("/settings/bill")}>
             <span className="stk-ico">
               <span className="icon-box" style={{ width: 18, height: 20 }}>
-                <img className="icon" src="/icons/row-bill.svg" alt="" />
+                <img className="icon" src={publicUrl("/icons/row-bill.svg")} alt="" />
               </span>
             </span>
             Bill
             <span className="icon-box chevron" style={{ width: 8, height: 12 }}>
-              <img className="icon" src="/icons/chevron.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/chevron.svg")} alt="" />
             </span>
           </button>
         </div>
@@ -41,19 +42,19 @@ export function SettingsPage() {
           <button className="stk-row press" type="button" onClick={() => navigate("/legal/terms")}>
             Terms of Use
             <span className="icon-box chevron" style={{ width: 8, height: 12 }}>
-              <img className="icon" src="/icons/chevron.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/chevron.svg")} alt="" />
             </span>
           </button>
           <button className="stk-row press" type="button" onClick={() => navigate("/legal/privacy")}>
             Privacy Policy
             <span className="icon-box chevron" style={{ width: 8, height: 12 }}>
-              <img className="icon" src="/icons/chevron.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/chevron.svg")} alt="" />
             </span>
           </button>
           <button className="stk-row press" type="button" onClick={() => navigate("/legal/license")}>
             User License Agreement
             <span className="icon-box chevron" style={{ width: 8, height: 12 }}>
-              <img className="icon" src="/icons/chevron.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/chevron.svg")} alt="" />
             </span>
           </button>
         </div>

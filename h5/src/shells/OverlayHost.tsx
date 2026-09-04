@@ -15,6 +15,7 @@ import {
   useAppStore,
   type OverlayId,
 } from "../store/appStore";
+import { publicUrl } from "../lib/publicUrl";
 
 const NEW_MSG_HOLD_MS = 3000;
 const ACCOUNT_RESET_MS = 2000;
@@ -230,7 +231,7 @@ function NewMsgCard() {
     >
       <span className="newmsg-ico">
         <span className="icon-box" style={{ width: 17, height: 17 }}>
-          <img className="icon" src="/icons/new-msg.svg" alt="" />
+          <img className="icon" src={publicUrl("/icons/new-msg.svg")} alt="" />
         </span>
       </span>
       <span className="newmsg-body">
@@ -297,7 +298,7 @@ function GiftSheet() {
       <header className="sheet-head">
         <h2>Gifts</h2>
         <span className="sheet-coins">
-          <img src="/images/coin.png" alt="" />
+          <img src={publicUrl("/images/coin.png")} alt="" />
           {coins.toLocaleString()}
           <button
             className="sheet-plus press"
@@ -306,13 +307,13 @@ function GiftSheet() {
             onClick={() => openCoinShop(navigate)}
           >
             <span className="icon-box" style={{ width: 10, height: 10 }}>
-              <img className="icon" src="/icons/sheet-plus.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/sheet-plus.svg")} alt="" />
             </span>
           </button>
         </span>
         <button className="sheet-x press" type="button" aria-label="Close" onClick={close}>
           <span className="icon-box" style={{ width: 14, height: 14 }}>
-            <img className="icon" src="/icons/sheet-close.svg" alt="" />
+            <img className="icon" src={publicUrl("/icons/sheet-close.svg")} alt="" />
           </span>
         </button>
       </header>
@@ -327,7 +328,7 @@ function GiftSheet() {
             {pick === g.id ? (
               <span className="gift-check">
                 <span className="icon-box" style={{ width: 8, height: 6 }}>
-                  <img className="icon" src="/icons/sheet-check.svg" alt="" />
+                  <img className="icon" src={publicUrl("/icons/sheet-check.svg")} alt="" />
                 </span>
               </span>
             ) : null}
@@ -336,7 +337,7 @@ function GiftSheet() {
             </span>
             <strong>{g.name}</strong>
             <small>
-              <img src="/images/coin.png" alt="" />
+              <img src={publicUrl("/images/coin.png")} alt="" />
               {g.cost}
             </small>
           </button>
@@ -352,7 +353,7 @@ function GiftSheet() {
       >
         Send Gift
         <span className="icon-box" style={{ width: 16, height: 13 }}>
-          <img className="icon" src="/icons/sheet-send.svg" alt="" />
+          <img className="icon" src={publicUrl("/icons/sheet-send.svg")} alt="" />
         </span>
       </button>
     </div>
@@ -368,12 +369,12 @@ function CoinsSheet() {
       <header className="sheet-head">
         <h2>COINS</h2>
         <span className="sheet-coins">
-          <img src="/images/coin.png" alt="" />
+          <img src={publicUrl("/images/coin.png")} alt="" />
           {coins.toLocaleString()}
         </span>
         <button className="sheet-x press" type="button" aria-label="Close" onClick={close}>
           <span className="icon-box" style={{ width: 14, height: 14 }}>
-            <img className="icon" src="/icons/sheet-close.svg" alt="" />
+            <img className="icon" src={publicUrl("/icons/sheet-close.svg")} alt="" />
           </span>
         </button>
       </header>
@@ -394,7 +395,7 @@ function UnlockCard() {
     <div className="overlay-card is-unlock" role="dialog" aria-labelledby="unlock-title">
       <div className="unlock-badge">
         <span className="icon-box" style={{ width: 21, height: 28 }}>
-          <img className="icon" src="/icons/unlock-vip.svg" alt="" />
+          <img className="icon" src={publicUrl("/icons/unlock-vip.svg")} alt="" />
         </span>
       </div>
       <div className="unlock-copy">
@@ -453,13 +454,13 @@ function EndCallCard() {
       <div className="endcall-votes">
         <button className={`endcall-vote press ${vote === "bad" ? "is-on" : ""}`} type="button" onClick={() => setVote("bad")}>
           <span className="icon-box" style={{ width: 28, height: 27 }}>
-            <img className="icon" src="/icons/endcall-bad.svg" alt="" />
+            <img className="icon" src={publicUrl("/icons/endcall-bad.svg")} alt="" />
           </span>
           Bad
         </button>
         <button className={`endcall-vote press ${vote === "good" ? "is-on" : ""}`} type="button" onClick={() => setVote("good")}>
           <span className="icon-box" style={{ width: 28, height: 27 }}>
-            <img className="icon" src="/icons/endcall-good.svg" alt="" />
+            <img className="icon" src={publicUrl("/icons/endcall-good.svg")} alt="" />
           </span>
           Good
         </button>
@@ -477,17 +478,17 @@ function OverlayClose({ variant }: { variant?: "checkin" | "rate" | "promo" | "e
   return (
     <button className={`overlay-x press ${floating ? "is-rate" : ""} ${variant === "promo" ? "is-promo" : ""} ${variant === "endcall" ? "is-endcall" : ""} ${variant === "reward3" ? "is-reward3" : ""} ${variant === "welcome" ? "is-welcome" : ""}`} type="button" aria-label="Close" onClick={close}>
       <span className="icon-box" style={{ width: variant === "promo" ? 14 : 12, height: variant === "promo" ? 14 : 12 }}>
-        <img className="icon" src={variant === "endcall" ? "/icons/endcall-close.svg" : variant === "promo" ? "/icons/promo-close.svg" : "/icons/pop-close.svg"} alt="" />
+        <img className="icon" src={variant === "endcall" ? publicUrl("/icons/endcall-close.svg") : variant === "promo" ? publicUrl("/icons/promo-close.svg") : publicUrl("/icons/pop-close.svg")} alt="" />
       </span>
     </button>
   );
 }
 
 const WELCOME_PRIVILEGES = [
-  { icon: "/icons/welcome-call.svg", w: 20, h: 16, title: "Free Daily Call", copy: "One 15s video call every day." },
-  { icon: "/icons/welcome-chat.svg", w: 20, h: 20, title: "Free Messaging", copy: "Start with 5 free messages." },
-  { icon: "/icons/welcome-key.svg", w: 22, h: 12, title: "Direct Access", copy: "Unlock private contact details." },
-  { icon: "/icons/welcome-heart.svg", w: 20, h: 18, title: "Real-World Dating", copy: "One chance to initiate an offline date." },
+  { icon: publicUrl("/icons/welcome-call.svg"), w: 20, h: 16, title: "Free Daily Call", copy: "One 15s video call every day." },
+  { icon: publicUrl("/icons/welcome-chat.svg"), w: 20, h: 20, title: "Free Messaging", copy: "Start with 5 free messages." },
+  { icon: publicUrl("/icons/welcome-key.svg"), w: 22, h: 12, title: "Direct Access", copy: "Unlock private contact details." },
+  { icon: publicUrl("/icons/welcome-heart.svg"), w: 20, h: 18, title: "Real-World Dating", copy: "One chance to initiate an offline date." },
 ] as const;
 
 function WelcomeCard() {
@@ -498,7 +499,7 @@ function WelcomeCard() {
       <OverlayClose variant="welcome" />
       <div className="welcome-hero" aria-hidden>
         <span className="icon-box" style={{ width: 43, height: 41 }}>
-          <img className="icon" src="/icons/welcome-popper.svg" alt="" />
+          <img className="icon" src={publicUrl("/icons/welcome-popper.svg")} alt="" />
         </span>
       </div>
       <h2 id="welcome-title">Welcome to LiveGirl</h2>
@@ -526,7 +527,7 @@ function WelcomeCard() {
       <button className="btn-primary press" type="button" onClick={claimWelcome}>
         Claim My Privileges
         <span className="icon-box" style={{ width: 12, height: 12 }}>
-          <img className="icon" src="/icons/arrow.svg" alt="" />
+          <img className="icon" src={publicUrl("/icons/arrow.svg")} alt="" />
         </span>
       </button>
     </div>
@@ -566,7 +567,7 @@ function Reward3Card() {
       <button className="btn-primary press" type="button" onClick={onBuy}>
         GET IT NOW
         <span className="icon-box" style={{ width: 12, height: 12 }}>
-          <img className="icon" src="/icons/arrow.svg" alt="" />
+          <img className="icon" src={publicUrl("/icons/arrow.svg")} alt="" />
         </span>
       </button>
       <button className="overlay-later press" type="button" onClick={close}>
@@ -599,7 +600,7 @@ function PromoCard() {
 
   return (
     <div className="overlay-card is-promo" role="dialog" aria-labelledby="promo-title">
-      <img className="promo-hero" src="/images/promo-hero.jpg" alt="" />
+      <img className="promo-hero" src={publicUrl("/images/promo-hero.jpg")} alt="" />
       <div className="promo-shade" />
       <OverlayClose variant="promo" />
       <div className="promo-body">
@@ -612,7 +613,7 @@ function PromoCard() {
         <div className="promo-pack">
           <div className="promo-coins">
             <span className="icon-box" style={{ width: 16, height: 14 }}>
-              <img className="icon" src="/icons/promo-coin.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/promo-coin.svg")} alt="" />
             </span>
             150 Coins
           </div>
@@ -627,7 +628,7 @@ function PromoCard() {
         <button className="btn-primary press" type="button" onClick={onBuy}>
           Call Now!
           <span className="icon-box" style={{ width: 20, height: 16 }}>
-            <img className="icon" src="/icons/promo-call.svg" alt="" />
+            <img className="icon" src={publicUrl("/icons/promo-call.svg")} alt="" />
           </span>
         </button>
       </div>
@@ -664,11 +665,11 @@ function TaskCard() {
               <span>{isToday && !claimedToday ? "Today" : `Day ${n}`}</span>
               {isToday ? (
                 <span className="icon-box checkin-coin" style={{ width: 27, height: 27 }}>
-                  <img className="icon" src="/icons/checkin-coin.svg" alt="" />
+                  <img className="icon" src={publicUrl("/icons/checkin-coin.svg")} alt="" />
                 </span>
               ) : (
                 <span className="icon-box" style={{ width: 20, height: 17 }}>
-                  <img className="icon" src="/images/checkin-gem.png" alt="" />
+                  <img className="icon" src={publicUrl("/images/checkin-gem.png")} alt="" />
                 </span>
               )}
               <strong>{CHECKIN_REWARD}</strong>
@@ -678,7 +679,7 @@ function TaskCard() {
         <div className={`checkin-bonus ${day === 7 ? "is-today" : ""}`}>
           <span className="checkin-gift">
             <span className="icon-box" style={{ width: 20, height: 19 }}>
-              <img className="icon" src="/icons/checkin-gift.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/checkin-gift.svg")} alt="" />
             </span>
           </span>
           <div>
@@ -687,7 +688,7 @@ function TaskCard() {
           </div>
           <em>
             <span className="icon-box" style={{ width: 20, height: 17 }}>
-              <img className="icon" src="/images/checkin-gem.png" alt="" />
+              <img className="icon" src={publicUrl("/images/checkin-gem.png")} alt="" />
             </span>
             {CHECKIN_BONUS}+
           </em>
@@ -716,13 +717,13 @@ function RateCard() {
       <div className="rate-hero">
         <div className="rate-stars">
           <span className="icon-box rate-star is-l" style={{ width: 24, height: 23 }}>
-            <img className="icon" src="/icons/rate-star-l.svg" alt="" />
+            <img className="icon" src={publicUrl("/icons/rate-star-l.svg")} alt="" />
           </span>
           <span className="icon-box rate-star is-c" style={{ width: 25, height: 24 }}>
-            <img className="icon" src="/icons/rate-star-c.svg" alt="" />
+            <img className="icon" src={publicUrl("/icons/rate-star-c.svg")} alt="" />
           </span>
           <span className="icon-box rate-star is-r" style={{ width: 24, height: 23 }}>
-            <img className="icon" src="/icons/rate-star-r.svg" alt="" />
+            <img className="icon" src={publicUrl("/icons/rate-star-r.svg")} alt="" />
           </span>
         </div>
         <div className="rate-coin">

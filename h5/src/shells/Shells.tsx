@@ -3,13 +3,14 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { usePullToRefresh } from "../hooks/usePullToRefresh";
 import { openNewUserOffer } from "../lib/paywall";
 import { useAppStore } from "../store/appStore";
+import { publicUrl } from "../lib/publicUrl";
 
 const tabs = [
-  { id: "home", to: "/app/home", label: "Home", icon: "/icons/tab-home.svg" },
-  { id: "reels", to: "/app/reels", label: "Reels", icon: "/icons/tab-reels.svg" },
-  { id: "ranking", to: "/app/ranking", label: "Ranking", icon: "/icons/tab-ranking.svg" },
-  { id: "messages", to: "/app/messages", label: "Messages", icon: "/icons/tab-messages.svg" },
-  { id: "me", to: "/app/me", label: "Me", icon: "/icons/tab-me.svg" },
+  { id: "home", to: "/app/home", label: "Home", icon: publicUrl("/icons/tab-home.svg") },
+  { id: "reels", to: "/app/reels", label: "Reels", icon: publicUrl("/icons/tab-reels.svg") },
+  { id: "ranking", to: "/app/ranking", label: "Ranking", icon: publicUrl("/icons/tab-ranking.svg") },
+  { id: "messages", to: "/app/messages", label: "Messages", icon: publicUrl("/icons/tab-messages.svg") },
+  { id: "me", to: "/app/me", label: "Me", icon: publicUrl("/icons/tab-me.svg") },
 ] as const;
 
 export function OfferGiftButton() {
@@ -20,7 +21,7 @@ export function OfferGiftButton() {
     <div className="header-actions">
       <button className="gift-btn press" type="button" aria-label="New user offer" onClick={() => openNewUserOffer(navigate)}>
         <span className="icon-box" style={{ width: 30, height: 30 }}>
-          <img className="icon" src="/images/gift-box.png" alt="" />
+          <img className="icon" src={publicUrl("/images/gift-box.png")} alt="" />
         </span>
       </button>
     </div>

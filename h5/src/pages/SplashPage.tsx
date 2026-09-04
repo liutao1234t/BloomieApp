@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "../store/appStore";
 import { FullscreenShell } from "../shells/Shells";
+import { publicUrl } from "../lib/publicUrl";
 
 const SPLASH_LOADING_MS = 1000;
 
@@ -23,7 +24,7 @@ export function SplashPage() {
     <FullscreenShell>
       <div className="splash">
         <div className="splash-bg">
-          <img src="/images/splash-bg.png" alt="" />
+          <img src={publicUrl("/images/splash-bg.png")} alt="" />
         </div>
         <div className="splash-body">
           <h1>
@@ -43,7 +44,7 @@ export function SplashPage() {
           >
             Get Started
             <span className="icon-box" style={{ width: 16, height: 16 }}>
-              <img className="icon" src="/icons/arrow.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/arrow.svg")} alt="" />
             </span>
           </button>
           <p className="legal">

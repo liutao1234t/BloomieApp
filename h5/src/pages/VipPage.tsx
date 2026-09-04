@@ -3,14 +3,15 @@ import { IAP_VIP } from "../data/iap";
 import { StackBar } from "../shells/StackBar";
 import { StackShell } from "../shells/Shells";
 import { useAppStore } from "../store/appStore";
+import { publicUrl } from "../lib/publicUrl";
 
 const benefits = [
-  { icon: "/icons/vip-reel.svg", w: 20, h: 16, title: "Unlock Short Videos", copy: "Access premium content" },
-  { icon: "/icons/vip-chat.svg", w: 20, h: 20, title: "Unlimited Free Message", copy: "Connect without limits" },
-  { icon: "/icons/vip-coin.png", w: 20, h: 17, title: "2,000 Coins Now", copy: "Get rewarded immediately" },
-  { icon: "/icons/vip-video.svg", w: 20, h: 16, title: "50% Off Video Calls Fee", copy: "Chat longer for less" },
-  { icon: "/icons/vip-contact.svg", w: 20, h: 22, title: "Exchange Contacts", copy: "Private connections" },
-  { icon: "/icons/vip-date.svg", w: 20, h: 18, title: "Offline Dating Privileges", copy: "Initiate local dates" },
+  { icon: publicUrl("/icons/vip-reel.svg"), w: 20, h: 16, title: "Unlock Short Videos", copy: "Access premium content" },
+  { icon: publicUrl("/icons/vip-chat.svg"), w: 20, h: 20, title: "Unlimited Free Message", copy: "Connect without limits" },
+  { icon: publicUrl("/icons/vip-coin.png"), w: 20, h: 17, title: "2,000 Coins Now", copy: "Get rewarded immediately" },
+  { icon: publicUrl("/icons/vip-video.svg"), w: 20, h: 16, title: "50% Off Video Calls Fee", copy: "Chat longer for less" },
+  { icon: publicUrl("/icons/vip-contact.svg"), w: 20, h: 22, title: "Exchange Contacts", copy: "Private connections" },
+  { icon: publicUrl("/icons/vip-date.svg"), w: 20, h: 18, title: "Offline Dating Privileges", copy: "Initiate local dates" },
 ];
 
 export function VipPage() {
@@ -49,7 +50,7 @@ export function VipPage() {
         <div className="vip-intro">
           <div className="vip-gem">
             <span className="icon-box" style={{ width: 48, height: 43 }}>
-              <img className="icon" src="/icons/vip-gem.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/vip-gem.svg")} alt="" />
             </span>
           </div>
           <h2>Become VIP</h2>

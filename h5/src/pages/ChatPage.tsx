@@ -5,6 +5,7 @@ import { tryDial } from "../lib/paywall";
 import { StackShell } from "../shells/Shells";
 import { useAppStore } from "../store/appStore";
 import { useHostsStore } from "../store/hostsStore";
+import { publicUrl } from "../lib/publicUrl";
 
 export function ChatPage() {
   const { id = "isabella" } = useParams();
@@ -52,7 +53,7 @@ export function ChatPage() {
         <header className="chat-header">
           <button className="circle-btn press" type="button" aria-label="Back" onClick={() => navigate(-1)}>
             <span className="icon-box" style={{ width: 16, height: 16 }}>
-              <img className="icon" src="/icons/back.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/back.svg")} alt="" />
             </span>
           </button>
           <div className="chat-person">
@@ -60,7 +61,7 @@ export function ChatPage() {
               <img className="avatar" src={girl.avatar} alt="" />
               {girl.online ? (
                 <span className="icon-box chat-online" style={{ width: 12, height: 12 }}>
-                  <img className="icon" src="/icons/chat-online.svg" alt="" />
+                  <img className="icon" src={publicUrl("/icons/chat-online.svg")} alt="" />
                 </span>
               ) : null}
             </span>
@@ -71,7 +72,7 @@ export function ChatPage() {
           </div>
           <button className="circle-btn press" type="button" aria-label="More" onClick={() => navigate(`/report/${id}`)}>
             <span className="icon-box" style={{ width: 4, height: 16 }}>
-              <img className="icon" src="/icons/more.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/more.svg")} alt="" />
             </span>
           </button>
         </header>
@@ -80,25 +81,25 @@ export function ChatPage() {
         <>
           <button className="float-call press" type="button" onClick={() => tryDial(girl.id, girl.ratePerMin, navigate)}>
             <span className="icon-box" style={{ width: 20, height: 16 }}>
-              <img className="icon" src="/icons/video-chat.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/video-chat.svg")} alt="" />
             </span>
             Start Video Call
           </button>
           <form className="composer" onSubmit={onSend}>
             <button className="composer-gift press" type="button" aria-label="Gift" onClick={() => openOverlay("gift", id)}>
               <span className="icon-box" style={{ width: 40, height: 40 }}>
-                <img className="icon" src="/images/chat-gift.png" alt="" />
+                <img className="icon" src={publicUrl("/images/chat-gift.png")} alt="" />
               </span>
             </button>
             <button className="round press" type="button" aria-label="More">
               <span className="icon-box" style={{ width: 15, height: 15 }}>
-                <img className="icon" src="/icons/plus.svg" alt="" />
+                <img className="icon" src={publicUrl("/icons/plus.svg")} alt="" />
               </span>
             </button>
             <input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Type a message..." />
             <button className="send press" type="submit" aria-label="Send">
               <span className="icon-box" style={{ width: 19, height: 16 }}>
-                <img className="icon" src="/icons/send.svg" alt="" />
+                <img className="icon" src={publicUrl("/icons/send.svg")} alt="" />
               </span>
             </button>
           </form>
@@ -123,7 +124,7 @@ export function ChatPage() {
                 <div className="bubble-row out">
                   <div className="bubble fail">{m.text}</div>
                   <span className="icon-box" style={{ width: 20, height: 20 }}>
-                    <img className="icon" src="/icons/fail.svg" alt="" />
+                    <img className="icon" src={publicUrl("/icons/fail.svg")} alt="" />
                   </span>
                 </div>
                 {i === lastFailIndex && lastFailIndex === msgs.length - 1 && !isVip ? (

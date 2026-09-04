@@ -6,6 +6,7 @@ import { formatCallRate, tryDial, useCallRate } from "../lib/paywall";
 import { StackShell } from "../shells/Shells";
 import { useAppStore } from "../store/appStore";
 import { noteProfileView } from "../store/incomingCallStore";
+import { publicUrl } from "../lib/publicUrl";
 
 export function ProfilePage() {
   const { id = "isabella" } = useParams();
@@ -49,18 +50,18 @@ export function ProfilePage() {
   return (
     <StackShell>
       <div className="profile-hero">
-        <img className="cover" src={girl.id === "isabella" ? "/images/profile-hero.png" : girl.photo} alt="" />
+        <img className="cover" src={girl.id === "isabella" ? publicUrl("/images/profile-hero.png") : girl.photo} alt="" />
         <div className="shade-top" />
         <div className="shade" />
         <div className="profile-nav">
           <button className="circle-btn press" type="button" aria-label="Back" onClick={() => navigate(-1)}>
             <span className="icon-box" style={{ width: 16, height: 16 }}>
-              <img className="icon" src="/icons/back.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/back.svg")} alt="" />
             </span>
           </button>
           <button className="circle-btn press" type="button" aria-label="More" onClick={() => navigate(`/report/${girl.id}`)}>
             <span className="icon-box" style={{ width: 4, height: 16 }}>
-              <img className="icon" src="/icons/more.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/more.svg")} alt="" />
             </span>
           </button>
         </div>
@@ -72,7 +73,7 @@ export function ProfilePage() {
               </h1>
               <p className="loc">
                 <span className="icon-box" style={{ width: 12, height: 15 }}>
-                  <img className="icon" src="/icons/pin.svg" alt="" />
+                  <img className="icon" src={publicUrl("/icons/pin.svg")} alt="" />
                 </span>
                 {girl.city}, {girl.country}
               </p>
@@ -94,20 +95,20 @@ export function ProfilePage() {
         <button className="btn-primary press" type="button" onClick={() => tryDial(girl.id, girl.ratePerMin, navigate)}>
           <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span className="icon-box" style={{ width: 20, height: 16 }}>
-              <img className="icon" src="/icons/video-chat.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/video-chat.svg")} alt="" />
             </span>
             Video Call
           </span>
           <small>
             <span className="icon-box" style={{ width: 15, height: 13 }}>
-              <img className="icon" src="/images/coin.png" alt="" />
+              <img className="icon" src={publicUrl("/images/coin.png")} alt="" />
             </span>
             {formatCallRate(callRate)}
           </small>
         </button>
         <button className="side-btn press" type="button" aria-label="Message" onClick={() => navigate(`/chat/${girl.id}`)}>
           <span className="icon-box" style={{ width: 20, height: 20 }}>
-            <img className="icon" src="/icons/heart.svg" alt="" />
+            <img className="icon" src={publicUrl("/icons/heart.svg")} alt="" />
           </span>
         </button>
         <button
@@ -118,7 +119,7 @@ export function ProfilePage() {
           onClick={() => toggleFollow(girl.id)}
         >
           <span className="icon-box" style={{ width: 22, height: 16 }}>
-            <img className="icon" src={followed ? "/icons/follow-check.svg" : "/icons/message.svg"} alt="" />
+            <img className="icon" src={followed ? publicUrl("/icons/follow-check.svg") : publicUrl("/icons/message.svg")} alt="" />
           </span>
         </button>
       </div>
@@ -143,10 +144,10 @@ export function ProfilePage() {
         <h3 style={{ fontSize: 14 }}>Profile Verification</h3>
         <div className="verify-grid">
           {[
-            ["Facebook", "/icons/verify-fb.svg", "#2563eb"],
-            ["Twitter", "/icons/verify-x.svg", "#60a5fa"],
-            ["Phone", "/icons/verify-phone.svg", "#9333ea"],
-            ["Photo", "/icons/verify-photo.svg", "#ec4899"],
+            ["Facebook", publicUrl("/icons/verify-fb.svg"), "#2563eb"],
+            ["Twitter", publicUrl("/icons/verify-x.svg"), "#60a5fa"],
+            ["Phone", publicUrl("/icons/verify-phone.svg"), "#9333ea"],
+            ["Photo", publicUrl("/icons/verify-photo.svg"), "#ec4899"],
           ].map(([label, src, bg]) => (
             <div key={label} className="verify-item">
               <span className="badge" style={{ background: bg }}>

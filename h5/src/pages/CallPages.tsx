@@ -17,6 +17,7 @@ import { HANGUP_EXIT_MS } from "../shells/navMotion";
 import { FullscreenShell } from "../shells/Shells";
 import { cancelEndCallPop, formatCallClock, scheduleEndCallPop, useAppStore } from "../store/appStore";
 import { dismissIncoming, ignoreNextProfileView, useIncomingCallStore } from "../store/incomingCallStore";
+import { publicUrl } from "../lib/publicUrl";
 
 const UNAVAILABLE_MS = 10_000;
 const CONNECT_HOLD_MS = 6_000;
@@ -104,11 +105,11 @@ export function OutgoingCallPage() {
         <div className="veil" />
         <div className="call-center">
           <div className="pulse-avatar">
-            <img src={girl.id === "isabella" ? "/images/calling-portrait.png" : girl.photo} alt="" />
+            <img src={girl.id === "isabella" ? publicUrl("/images/calling-portrait.png") : girl.photo} alt="" />
           </div>
           <div className="encrypt">
             <span className="icon-box" style={{ width: 10, height: 12 }}>
-              <img className="icon" src="/icons/lock.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/lock.svg")} alt="" />
             </span>
             End-to-End Encrypted
           </div>
@@ -116,7 +117,7 @@ export function OutgoingCallPage() {
           <p className="status">Calling...</p>
           <p className="rate">
             <span className="icon-box" style={{ width: 12, height: 11 }}>
-              <img className="icon" src="/icons/call-rate.png" alt="" />
+              <img className="icon" src={publicUrl("/icons/call-rate.png")} alt="" />
             </span>
             {formatCallRate(callRate)}
           </p>
@@ -137,7 +138,7 @@ export function OutgoingCallPage() {
                 }}
               >
                 <span className="icon-box" style={{ width: 34, height: 13 }}>
-                  <img className="icon" src="/icons/hangup.svg" alt="" />
+                  <img className="icon" src={publicUrl("/icons/hangup.svg")} alt="" />
                 </span>
               </button>
             </div>
@@ -167,7 +168,7 @@ export function IncomingCallPage({ girlId }: { girlId?: string } = {}) {
   const holdUntil = useRef(0);
   const failTimer = useRef<number | undefined>(undefined);
   const holdTimer = useRef<number | undefined>(undefined);
-  const portrait = girl.photo || "/images/incoming-portrait.png";
+  const portrait = girl.photo || publicUrl("/images/incoming-portrait.png");
   const clip = girl.videoUrl?.trim() ?? "";
   const hasClip = isUsableVideoUrl(clip);
   const alreadyCalled = useAppStore((s) => (s.calledGirlIds ?? []).includes(girl.id));
@@ -291,7 +292,7 @@ export function IncomingCallPage({ girlId }: { girlId?: string } = {}) {
           </div>
           <div className="encrypt">
             <span className="icon-box" style={{ width: 10, height: 12 }}>
-              <img className="icon" src="/icons/lock.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/lock.svg")} alt="" />
             </span>
             End-to-End Encrypted
           </div>
@@ -299,7 +300,7 @@ export function IncomingCallPage({ girlId }: { girlId?: string } = {}) {
           <p className="status is-in">{accepted ? "Connecting..." : "Incoming Video Call..."}</p>
           <p className="rate">
             <span className="icon-box" style={{ width: 12, height: 11 }}>
-              <img className="icon" src="/icons/call-rate.png" alt="" />
+              <img className="icon" src={publicUrl("/icons/call-rate.png")} alt="" />
             </span>
             {formatCallRate(callRate)}
           </p>
@@ -313,7 +314,7 @@ export function IncomingCallPage({ girlId }: { girlId?: string } = {}) {
                 ) : null}
                 <button className="hang press" type="button" aria-label="Decline" onClick={leaveIncoming}>
                   <span className="icon-box" style={{ width: 34, height: 13 }}>
-                    <img className="icon" src="/icons/hangup.svg" alt="" />
+                    <img className="icon" src={publicUrl("/icons/hangup.svg")} alt="" />
                   </span>
                 </button>
               </div>
@@ -322,7 +323,7 @@ export function IncomingCallPage({ girlId }: { girlId?: string } = {}) {
                 <div className="lbl">
                   <button className="hang press" type="button" aria-label="Decline" onClick={leaveIncoming}>
                     <span className="icon-box" style={{ width: 34, height: 13 }}>
-                      <img className="icon" src="/icons/hangup.svg" alt="" />
+                      <img className="icon" src={publicUrl("/icons/hangup.svg")} alt="" />
                     </span>
                   </button>
                   Decline
@@ -331,7 +332,7 @@ export function IncomingCallPage({ girlId }: { girlId?: string } = {}) {
                   <div className="accept-beat">
                     <button className="accept press" type="button" aria-label="Accept" onClick={onAccept}>
                       <span className="icon-box" style={{ width: 30, height: 24 }}>
-                        <img className="icon" src="/icons/accept-video.svg" alt="" />
+                        <img className="icon" src={publicUrl("/icons/accept-video.svg")} alt="" />
                       </span>
                     </button>
                   </div>
@@ -366,7 +367,7 @@ export function InCallPage() {
   const [cameraOn, setCameraOn] = useState(true);
   const [cameraLive, setCameraLive] = useState(false);
   const [clipReady, setClipReady] = useState(false);
-  const clip = girl.videoUrl?.trim() || "/media/call.mp4";
+  const clip = girl.videoUrl?.trim() || publicUrl("/media/call.mp4");
   const mutedRef = useRef(muted);
   mutedRef.current = muted;
 
@@ -528,7 +529,7 @@ export function InCallPage() {
         <div className="incall-hud">
           <div className="hud-pill hud-private">
             <span className="hud-lock" aria-hidden>
-              <img className="icon" src="/icons/private.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/private.svg")} alt="" />
             </span>
             <span className="hud-private-copy">
               <strong>Private Chat</strong>
@@ -545,7 +546,7 @@ export function InCallPage() {
             aria-label="Get coins"
             onClick={() => openCoinShop(navigate)}
           >
-            <img className="hud-coin" src="/images/coin.png" alt="" />
+            <img className="hud-coin" src={publicUrl("/images/coin.png")} alt="" />
             {coins.toLocaleString()}
           </button>
         </div>
@@ -554,7 +555,7 @@ export function InCallPage() {
         </div>
         <div className="incall-bar">
           <button className="glass-btn press" type="button" aria-label={muted ? "Unmute" : "Mute"} onClick={() => setMuted((v) => !v)}>
-            <img className="icon" src={muted ? "/icons/mic-off.svg" : "/icons/mic.svg"} alt="" />
+            <img className="icon" src={muted ? publicUrl("/icons/mic-off.svg") : publicUrl("/icons/mic.svg")} alt="" />
           </button>
           <button
             className="glass-btn press"
@@ -562,13 +563,13 @@ export function InCallPage() {
             aria-label={cameraOn ? "Turn camera off" : "Turn camera on"}
             onClick={() => setCameraOn((v) => !v)}
           >
-            <img className="icon" src={cameraOn ? "/icons/camera.svg" : "/icons/camera-off.svg"} alt="" />
+            <img className="icon" src={cameraOn ? publicUrl("/icons/camera.svg") : publicUrl("/icons/camera-off.svg")} alt="" />
           </button>
           <button className="hang incall-hang press" type="button" aria-label="End call" onClick={() => hangUp("user")}>
-            <img className="icon" src="/icons/hangup-phone.svg" alt="" />
+            <img className="icon" src={publicUrl("/icons/hangup-phone.svg")} alt="" />
           </button>
           <button className="glass-btn press" type="button" aria-label="Gift" onClick={() => openOverlay("gift", id)}>
-            <img className="icon" src="/icons/gift.svg" alt="" />
+            <img className="icon" src={publicUrl("/icons/gift.svg")} alt="" />
           </button>
         </div>
       </div>

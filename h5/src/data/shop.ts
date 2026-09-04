@@ -1,4 +1,5 @@
 import type { IapProductId } from "./iap";
+import { publicUrl } from "../lib/publicUrl";
 
 export type CoinPack = {
   id: string;
@@ -36,10 +37,10 @@ export type Gift = {
 };
 
 export const gifts: Gift[] = [
-  { id: "cake", name: "Celebration\nCake", cost: 30, icon: "/icons/gift-cake.svg" },
-  { id: "trophy", name: "Trophy", cost: 50, icon: "/icons/gift-trophy.svg" },
-  { id: "toast", name: "Champagne\nToast", cost: 100, icon: "/icons/gift-toast.svg" },
-  { id: "carpet", name: "Red Carpet", cost: 500, icon: "/icons/gift-carpet.svg" },
-  { id: "ticket", name: "Concert Ticket", cost: 800, icon: "/icons/gift-ticket.svg" },
-  { id: "car", name: "Supercar", cost: 1000, icon: "/icons/gift-car.svg", gold: true },
+  { id: "cake", name: "Celebration\nCake", cost: 30, icon: publicUrl("/icons/gift-cake.svg") },
+  { id: "trophy", name: "Trophy", cost: 50, icon: publicUrl("/icons/gift-trophy.svg") },
+  { id: "toast", name: "Champagne\nToast", cost: 100, icon: publicUrl("/icons/gift-toast.svg") },
+  { id: "carpet", name: "Red Carpet", cost: 500, icon: publicUrl("/icons/gift-carpet.svg") },
+  { id: "ticket", name: "Concert Ticket", cost: 800, icon: publicUrl("/icons/gift-ticket.svg") },
+  { id: "car", name: "Supercar", cost: 1000, icon: publicUrl("/icons/gift-car.svg"), gold: true },
 ];

@@ -1,6 +1,7 @@
 import { coinsIap } from "../data/iap";
 import { coinPacks, type CoinPack } from "../data/shop";
 import { useAppStore } from "../store/appStore";
+import { publicUrl } from "../lib/publicUrl";
 
 export function CoinPackGrid() {
   const payBusy = useAppStore((s) => s.payBusy);
@@ -51,7 +52,7 @@ function Pack({ pack, onBuy }: { pack: CoinPack; onBuy: () => void }) {
       {pack.best ? <span className="pack-best">SAVE BEST</span> : null}
       {pack.bonus ? <em>+{pack.bonus} Bonus</em> : null}
       <span className="icon-box pack-gem" style={{ width: 30, height: 27 }}>
-        <img className="icon" src="/images/coin.png" alt="" />
+        <img className="icon" src={publicUrl("/images/coin.png")} alt="" />
       </span>
       <strong>{pack.coins}</strong>
       <small>COINS</small>

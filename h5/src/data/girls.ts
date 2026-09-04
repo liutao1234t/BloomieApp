@@ -1,5 +1,6 @@
 import hostsJson from "./hosts.json";
 import { getInboxPerson, type InboxPerson } from "./inboxPeople";
+import { publicUrl } from "../lib/publicUrl";
 
 export type GirlCategory = "Hot" | "New" | "Sexy" | "Cute";
 export type GirlRegion = "Global" | "America" | "Europe" | "Asia" | "Africa" | "Middle East";
@@ -157,11 +158,11 @@ export const girls: Girl[] = [
     region: "Europe",
     online: true,
     ratePerMin: 50,
-    photo: "/images/profile-hero.png",
-    avatar: "/images/chat-avatar.png",
+    photo: publicUrl("/images/profile-hero.png"),
+    avatar: publicUrl("/images/chat-avatar.png"),
     bio: "Fashion student living in Milan. I love discussing art, trying new espresso blends, and late-night city walks. Let's chat about your favorite travel stories. ☕️✨",
     interests: ["Fashion Design", "Photography", "Espresso", "Modern Art"],
-    moments: ["/images/moment-1.png", "/images/moment-2.png", "/images/moment-3.png", "/images/moment-4.png"],
+    moments: [publicUrl("/images/moment-1.png"), publicUrl("/images/moment-2.png"), publicUrl("/images/moment-3.png"), publicUrl("/images/moment-4.png")],
     lastActive: "Active 2 minutes ago",
   },
 ];

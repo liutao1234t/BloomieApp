@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { StackBar } from "../shells/StackBar";
 import { StackShell } from "../shells/Shells";
 import { useAppStore } from "../store/appStore";
+import { publicUrl } from "../lib/publicUrl";
 
 export function EditProfilePage() {
   const navigate = useNavigate();
@@ -33,9 +34,9 @@ export function EditProfilePage() {
       <form className="stk-pad edit-form" onSubmit={onSave}>
         <button className="edit-ava-block press" type="button">
           <span className="edit-ava">
-            <img className="edit-ava-photo" src="/images/me-avatar.png" alt="" />
+            <img className="edit-ava-photo" src={publicUrl("/images/me-avatar.png")} alt="" />
             <span className="edit-cam">
-              <img className="edit-cam-icon" src="/icons/camera.svg" alt="" />
+              <img className="edit-cam-icon" src={publicUrl("/icons/camera.svg")} alt="" />
             </span>
           </span>
           <span className="edit-change">Change Profile Photo</span>
@@ -46,7 +47,7 @@ export function EditProfilePage() {
           <span className="edit-field">
             <input value={nick} onChange={(e) => setNick(e.target.value)} />
             <span className="icon-box" style={{ width: 23, height: 15 }}>
-              <img className="icon" src="/icons/pencil.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/pencil.svg")} alt="" />
             </span>
           </span>
         </label>
@@ -60,7 +61,7 @@ export function EditProfilePage() {
             <span className="stk-meta">
               {profile.gender}
               <span className="icon-box" style={{ width: 8, height: 12 }}>
-                <img className="icon" src="/icons/chevron.svg" alt="" />
+                <img className="icon" src={publicUrl("/icons/chevron.svg")} alt="" />
               </span>
             </span>
           </button>
@@ -69,7 +70,7 @@ export function EditProfilePage() {
             <span className="stk-meta">
               {profile.birthday}
               <span className="icon-box" style={{ width: 8, height: 12 }}>
-                <img className="icon" src="/icons/chevron.svg" alt="" />
+                <img className="icon" src={publicUrl("/icons/chevron.svg")} alt="" />
               </span>
             </span>
           </button>

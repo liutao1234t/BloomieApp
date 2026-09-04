@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { StackBar } from "../shells/StackBar";
 import { StackShell } from "../shells/Shells";
 import { useAppStore } from "../store/appStore";
+import { publicUrl } from "../lib/publicUrl";
 
 export function SupportPage() {
   const msgs = useAppStore((s) => s.supportMessages);
@@ -54,7 +55,7 @@ export function SupportPage() {
         <form className="sup-composer" onSubmit={onSend}>
           <button className="sup-clip press" type="button" aria-label="Attach">
             <span className="icon-box" style={{ width: 13, height: 20 }}>
-              <img className="icon" src="/icons/clip.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/clip.svg")} alt="" />
             </span>
           </button>
           <input
@@ -65,7 +66,7 @@ export function SupportPage() {
           />
           <button className="sup-send press" type="submit" aria-label="Send" disabled={busy}>
             <span className="icon-box" style={{ width: 19, height: 16 }}>
-              <img className="icon" src="/icons/send.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/send.svg")} alt="" />
             </span>
           </button>
         </form>
@@ -78,7 +79,7 @@ export function SupportPage() {
             {m.from === "them" ? (
               <span className="sup-ava">
                 <span className="icon-box" style={{ width: 12, height: 11 }}>
-                  <img className="icon" src="/icons/headset.svg" alt="" />
+                  <img className="icon" src={publicUrl("/icons/headset.svg")} alt="" />
                 </span>
               </span>
             ) : null}
@@ -92,7 +93,7 @@ export function SupportPage() {
           <div className="sup-row them" aria-live="polite" aria-label="Support is typing">
             <span className="sup-ava">
               <span className="icon-box" style={{ width: 12, height: 11 }}>
-                <img className="icon" src="/icons/headset.svg" alt="" />
+                <img className="icon" src={publicUrl("/icons/headset.svg")} alt="" />
               </span>
             </span>
             <div className="sup-bubble them is-typing">

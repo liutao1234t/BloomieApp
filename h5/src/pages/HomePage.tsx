@@ -6,6 +6,7 @@ import { tryDial } from "../lib/paywall";
 import { OfferGiftButton, TabShell } from "../shells/Shells";
 import { useAppStore } from "../store/appStore";
 import { useHostsStore } from "../store/hostsStore";
+import { publicUrl } from "../lib/publicUrl";
 
 const cats = ["Hot", "New", "Sexy", "Cute"] as const;
 const regions = ["Global", "America", "Europe", "Asia", "Africa", "Middle East"] as const;
@@ -50,7 +51,7 @@ function Card({ girl, tall, onOpen, onCall }: { girl: Girl; tall?: boolean; onOp
         <FitName name={girl.name} />
         <p>
           <span className="icon-box" style={{ width: 10, height: 12 }}>
-            <img className="icon" src="/icons/pin.svg" alt="" />
+            <img className="icon" src={publicUrl("/icons/pin.svg")} alt="" />
           </span>
           <span>{girl.country}</span>
         </p>
@@ -65,7 +66,7 @@ function Card({ girl, tall, onOpen, onCall }: { girl: Girl; tall?: boolean; onOp
         }}
       >
         <span className="icon-box" style={{ width: 20, height: 16 }}>
-          <img className="icon" src="/icons/video.svg" alt="" />
+          <img className="icon" src={publicUrl("/icons/video.svg")} alt="" />
         </span>
       </button>
     </article>
@@ -125,7 +126,7 @@ export function HomePage() {
           </div>
           <div className="regions">
             <span className="icon-box" style={{ width: 20, height: 20 }}>
-              <img className="icon" src="/icons/filter.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/filter.svg")} alt="" />
             </span>
             {regions.map((r) => (
               <button key={r} className={`region press ${region === r ? "is-on" : ""}`} onClick={() => setRegion(r)}>

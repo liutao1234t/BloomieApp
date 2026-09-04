@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { StackBar } from "../shells/StackBar";
 import { StackShell } from "../shells/Shells";
 import { useAppStore } from "../store/appStore";
+import { publicUrl } from "../lib/publicUrl";
 
 export function BillPage() {
   const navigate = useNavigate();
@@ -16,12 +17,12 @@ export function BillPage() {
           <h2>
             {coins.toLocaleString()}
             <span className="icon-box" style={{ width: 25, height: 22 }}>
-              <img className="icon" src="/images/coin.png" alt="" />
+              <img className="icon" src={publicUrl("/images/coin.png")} alt="" />
             </span>
           </h2>
           <button className="bill-more press" type="button" onClick={() => navigate("/coins")}>
             <span className="icon-box" style={{ width: 9, height: 9 }}>
-              <img className="icon" src="/icons/bill-plus.svg" alt="" />
+              <img className="icon" src={publicUrl("/icons/bill-plus.svg")} alt="" />
             </span>
             Get more
           </button>
@@ -30,7 +31,7 @@ export function BillPage() {
           <article key={row.id} className="bill-row">
             <span className="stk-ico lg">
               <span className="icon-box" style={{ width: 20, height: 20 }}>
-                <img className="icon" src={row.kind === "in" ? "/icons/bill-in.svg" : "/icons/bill-call.svg"} alt="" />
+                <img className="icon" src={row.kind === "in" ? publicUrl("/icons/bill-in.svg") : publicUrl("/icons/bill-call.svg")} alt="" />
               </span>
             </span>
             <span>
@@ -40,7 +41,7 @@ export function BillPage() {
             <b className={row.kind === "in" ? "in" : ""}>
               {row.amount > 0 ? "+" : ""}
               {row.amount}
-              <img src="/images/coin.png" alt="" />
+              <img src={publicUrl("/images/coin.png")} alt="" />
             </b>
           </article>
         ))}

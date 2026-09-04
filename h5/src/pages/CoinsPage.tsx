@@ -2,6 +2,7 @@ import { CoinPackGrid } from "./CoinPacks";
 import { StackBar } from "../shells/StackBar";
 import { StackShell } from "../shells/Shells";
 import { useAppStore } from "../store/appStore";
+import { publicUrl } from "../lib/publicUrl";
 
 export function CoinsPage() {
   const coins = useAppStore((s) => s.coins);
@@ -15,7 +16,7 @@ export function CoinsPage() {
           right={
             <span className="coin-pill">
               <span className="icon-box" style={{ width: 20, height: 18 }}>
-                <img className="icon" src="/images/coin.png" alt="" />
+                <img className="icon" src={publicUrl("/images/coin.png")} alt="" />
               </span>
               {coins.toLocaleString()}
             </span>

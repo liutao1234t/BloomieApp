@@ -6,6 +6,7 @@ import { excludeCalled } from "../lib/calledHosts";
 import { OfferGiftButton, TabShell } from "../shells/Shells";
 import { useAppStore } from "../store/appStore";
 import { useHostsStore } from "../store/hostsStore";
+import { publicUrl } from "../lib/publicUrl";
 
 function PodiumCard({
   girl,
@@ -27,7 +28,7 @@ function PodiumCard({
       </span>
       {place === 1 ? (
         <span className="podium-crown">
-          <img className="icon" src="/icons/crown.svg" alt="" />
+          <img className="icon" src={publicUrl("/icons/crown.svg")} alt="" />
         </span>
       ) : null}
       <span className={`podium-badge place-${place}`}>{place}</span>
@@ -75,7 +76,7 @@ export function RankingPage() {
       ) : (
         <>
           <div className="podium">
-            <img className="podium-glow" src="/images/podium-glow.svg" alt="" />
+            <img className="podium-glow" src={publicUrl("/images/podium-glow.svg")} alt="" />
             {second ? <PodiumCard girl={second} place={2} onOpen={() => navigate(`/profile/${second.id}`)} /> : null}
             {first ? <PodiumCard girl={first} place={1} onOpen={() => navigate(`/profile/${first.id}`)} /> : null}
             {third ? <PodiumCard girl={third} place={3} onOpen={() => navigate(`/profile/${third.id}`)} /> : null}
@@ -95,7 +96,7 @@ export function RankingPage() {
                 </span>
                 <span className="heat">
                   <span className="icon-box" style={{ width: 11, height: 12 }}>
-                    <img className="icon" src="/icons/flame.svg" alt="" />
+                    <img className="icon" src={publicUrl("/icons/flame.svg")} alt="" />
                   </span>
                   {formatHeat(girl.fireCount ?? 0)}
                 </span>

@@ -7,6 +7,7 @@ import { OfferGiftButton, TabShell } from "../shells/Shells";
 import { useAppStore } from "../store/appStore";
 import { useHostsStore } from "../store/hostsStore";
 import { useSayHiStore } from "../store/sayHiStore";
+import { publicUrl } from "../lib/publicUrl";
 
 const officialPreview =
   "Welcome to our global family, it's crazy and sexy here. Go and Find your love! wave your fingers and start video chat!";
@@ -67,7 +68,7 @@ export function MessagesPage() {
     >
       <label className="search-bar">
         <span className="icon-box" style={{ width: 18, height: 18 }}>
-          <img className="icon" src="/icons/search.svg" alt="" />
+          <img className="icon" src={publicUrl("/icons/search.svg")} alt="" />
         </span>
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search chats..." />
       </label>
@@ -88,7 +89,7 @@ export function MessagesPage() {
       <div className="inbox-card official">
         <span className="official-icon">
           <span className="icon-box" style={{ width: 27, height: 22 }}>
-            <img className="icon" src="/icons/megaphone.svg" alt="" />
+            <img className="icon" src={publicUrl("/icons/megaphone.svg")} alt="" />
           </span>
         </span>
         <span className="inbox-body">

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getGirl } from "../data/girls";
 import { StackBar } from "../shells/StackBar";
 import { StackShell } from "../shells/Shells";
+import { publicUrl } from "../lib/publicUrl";
 
 const reasons = ["Inappropriate Content", "Harassment", "Spam", "Impersonation", "Other"];
 
@@ -28,7 +29,7 @@ export function ReportPage() {
               onClick={() => setDone(true)}
             >
               <span className="icon-box" style={{ width: 15, height: 17 }}>
-                <img className="icon" src="/icons/report-flag.svg" alt="" />
+                <img className="icon" src={publicUrl("/icons/report-flag.svg")} alt="" />
               </span>
               Submit Report
             </button>
@@ -78,7 +79,7 @@ export function ReportPage() {
             </div>
             <aside className="report-note">
               <span className="icon-box" style={{ width: 16, height: 22 }}>
-                <img className="icon" src="/icons/report-shield.svg" alt="" />
+                <img className="icon" src={publicUrl("/icons/report-shield.svg")} alt="" />
               </span>
               <p>Your report is anonymous and will be reviewed by our moderation team within 24 hours. We are committed to maintaining a safe, premium space for everyone.</p>
             </aside>

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { StackBar } from "../shells/StackBar";
 import { StackShell } from "../shells/Shells";
 import { useAppStore } from "../store/appStore";
+import { publicUrl } from "../lib/publicUrl";
 
 const reasons = [
   { label: "Request a refund", lines: ["Request a refund"] },
@@ -80,7 +81,7 @@ export function AppleSupportPage() {
       >
         <div className="as-chrome">
           <span className="icon-box as-apple" style={{ width: 24, height: 24 }}>
-            <img className="icon" src="/icons/apple-mark.svg" alt="" />
+            <img className="icon" src={publicUrl("/icons/apple-mark.svg")} alt="" />
           </span>
           <span className="as-menu" aria-hidden>
             <i />
@@ -162,7 +163,7 @@ export function AppleSupportPage() {
                     >
                       {checkIndex === i ? (
                         <span className="icon-box as-check" style={{ width: 22, height: 22 }}>
-                          <img className="icon" src="/icons/apple-check.svg" alt="" />
+                          <img className="icon" src={publicUrl("/icons/apple-check.svg")} alt="" />
                         </span>
                       ) : (
                         <span className="as-opt-gap" />

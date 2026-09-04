@@ -7,6 +7,7 @@ import { FREE_REEL_COUNT, isReelLocked, tryDial } from "../lib/paywall";
 import { TabShell } from "../shells/Shells";
 import { useAppStore } from "../store/appStore";
 import { useReelsStore } from "../store/reelsStore";
+import { publicUrl } from "../lib/publicUrl";
 
 function useReelsForeground(scrollerRef: RefObject<HTMLDivElement | null>) {
   const [paneShown, setPaneShown] = useState(true);
@@ -190,7 +191,7 @@ export function ReelsPage() {
                     </strong>
                     <small>
                       <span className="icon-box" style={{ width: 11, height: 13 }}>
-                        <img className="icon" src="/icons/pin.svg" alt="" />
+                        <img className="icon" src={publicUrl("/icons/pin.svg")} alt="" />
                       </span>
                       {item.city}, {item.country}
                     </small>
@@ -207,7 +208,7 @@ export function ReelsPage() {
                 <button className="reel-act press" type="button" onClick={shareAppDownload}>
                   <span className="reel-act-ico">
                     <span className="icon-box" style={{ width: 21, height: 23 }}>
-                      <img className="icon" src="/icons/share.svg" alt="" />
+                      <img className="icon" src={publicUrl("/icons/share.svg")} alt="" />
                     </span>
                   </span>
                   Share
@@ -219,7 +220,7 @@ export function ReelsPage() {
                 >
                   <span className="reel-act-ico">
                     <span className="icon-box" style={{ width: 23, height: 21 }}>
-                      <img className="icon" src="/icons/like.svg" alt="" />
+                      <img className="icon" src={publicUrl("/icons/like.svg")} alt="" />
                     </span>
                   </span>
                   {formatFireCount(item.fireCount ?? 0)}
@@ -231,7 +232,7 @@ export function ReelsPage() {
                   onClick={() => tryDial(item.id, item.ratePerMin, navigate)}
                 >
                   <span className="icon-box" style={{ width: 27, height: 21 }}>
-                    <img className="icon" src="/icons/reel-video.svg" alt="" />
+                    <img className="icon" src={publicUrl("/icons/reel-video.svg")} alt="" />
                   </span>
                 </button>
               </div>
