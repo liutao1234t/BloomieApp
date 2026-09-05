@@ -103,6 +103,10 @@ function parseReason(raw: unknown): string | undefined {
   return undefined;
 }
 
+export function iapSuccessToast(): string {
+  return "Purchase Success";
+}
+
 export function iapFailToast(reason?: string): string {
   if (reason === "user_cancelled") return "Purchase cancelled";
   if (reason === "pending") return "Purchase pending";
