@@ -24,7 +24,7 @@ let simulateTimer: number | undefined;
  * WKWebView contract
  *
  * H5 → Swift (`webkit.messageHandlers.iap.postMessage`):
- *   { productId: "coin_test_4" }
+ *   { productId: "com.user19.99.normal" }
  *
  * Readable field (updated when a purchase starts):
  *   window.iapProductId
@@ -34,8 +34,8 @@ let simulateTimer: number | undefined;
  *   window.onIAPFail({ reason: "product_not_found" })
  *   window.onIAPResult({ success: true })
  *
- * Type stays on the H5 pending click. coin_test_4 is coins or 3-day;
- * coin_test_5 is coins or VIP.
+ * Type stays on the H5 pending click. com.user19.99.normal is coins or 3-day;
+ * com.user25.99.normal is coins or VIP.
  */
 function nativeWindow() {
   return window as Window & {
