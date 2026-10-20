@@ -36,6 +36,7 @@ let catalogStarted = false;
 let lastCountedId = "";
 let lastCountedAt = 0;
 let skipNextProfileViewId: string | null = null;
+let navFromPath = "";
 let presentSeq = 0;
 let presentLock = false;
 
@@ -70,9 +71,25 @@ function waitForPhoto(src: string) {
   });
 }
 
+let routerPath = "";
+
+export function syncRouterPath(path: string) {
+  routerPath = path;
+}
+
+function stripBasename(pathname: string) {
+  const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+  if (base && pathname.startsWith(base)) {
+    const rest = pathname.slice(base.length);
+    return rest.startsWith("/") ? rest : `/${rest}`;
+  }
+  return pathname;
+}
+
 function currentPath() {
+  if (routerPath) return routerPath;
   if (typeof window === "undefined") return "";
-  return window.location.pathname;
+  return stripBasename(window.location.pathname);
 }
 
 function canPresentNow() {
@@ -140,7 +157,7 @@ async function ringNow() {
   }
   const host = pickUnusedHost();
   if (!host) {
-    pendingRing = false;
+    pendingRing = true;
     return false;
   }
   await presentIncoming(host);
@@ -176,13 +193,32 @@ export function ignoreNextProfileView(girlId: string) {
   skipNextProfileViewId = girlId;
 }
 
+export function rememberNavFrom(path: string) {
+  navFromPath = path;
+}
+
+function isReturnFromProfileChild(id: string, fromPath: string) {
+  if (!fromPath) return false;
+  return (
+    fromPath === `/chat/${id}` ||
+    fromPath === `/report/${id}` ||
+    fromPath === `/call/outgoing/${id}` ||
+    fromPath === `/call/incoming/${id}` ||
+    fromPath === `/call/in/${id}`
+  );
+}
+
 export function noteProfileView(girlId: string) {
   const id = girlId.trim();
   if (!id) return;
+  // Leaving panes stay mounted under chat/call; only the live profile route counts.
+  if (currentPath() !== `/profile/${id}`) return;
   if (skipNextProfileViewId === id) {
     skipNextProfileViewId = null;
     return;
   }
+  // Back from chat / call / report onto this profile is not a new view.
+  if (isReturnFromProfileChild(id, navFromPath)) return;
   const now = Date.now();
   if (id === lastCountedId && now - lastCountedAt < 800) return;
   lastCountedId = id;
@@ -198,9 +234,8 @@ export function noteHostReply(girlId: string) {
   const id = girlId.trim();
   if (!id) return;
   const thread = useAppStore.getState().threads[id] ?? [];
-  const hasHostMsg = thread.some((m) => m.from === "them");
   const delivered = thread.filter((m) => m.from === "me" && m.status !== "fail").length;
-  if (!hasHostMsg || delivered !== 1) return;
+  if (delivered !== 1) return;
   scheduleRing();
 }
 
@@ -232,6 +267,7 @@ export function resetIncomingCallSession() {
   lastCountedId = "";
   lastCountedAt = 0;
   skipNextProfileViewId = null;
+  navFromPath = "";
   setSkipIncomingExit(true);
   setIncomingOpen(false);
   useIncomingCallStore.setState({ ringingGirlId: null });
@@ -250,6 +286,7 @@ export function debugRingIncoming() {
 
 export function IncomingCallGate() {
   const location = useLocation();
+  syncRouterPath(location.pathname);
 
   useEffect(() => {
     if (location.pathname.startsWith("/call/") || location.pathname === "/") return;

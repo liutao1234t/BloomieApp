@@ -1,73 +1,54 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "../store/appStore";
 import { FullscreenShell } from "../shells/Shells";
-import { publicUrl } from "../lib/publicUrl";
-
-const SPLASH_LOADING_MS = 1000;
+import { LANDING_POSTER, mountLandingVideo } from "../lib/landingMedia";
 
 export function SplashPage() {
   const navigate = useNavigate();
   const startSession = useAppStore((s) => s.startSession);
-  const [entering, setEntering] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const [live, setLive] = useState(false);
+  const bgRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!entering) return;
-    const t = window.setTimeout(() => {
-      startSession();
-      navigate("/app/home", { replace: true });
-    }, SPLASH_LOADING_MS);
-    return () => window.clearTimeout(t);
-  }, [entering, startSession, navigate]);
+    const host = bgRef.current;
+    if (!host) return;
+    return mountLandingVideo(host, () => setLive(true));
+  }, []);
+
+  const onContinue = () => {
+    if (leaving) return;
+    setLeaving(true);
+    void startSession();
+    navigate("/app/home", { replace: true });
+  };
 
   return (
     <FullscreenShell>
       <div className="splash">
-        <div className="splash-bg">
-          <img src={publicUrl("/images/splash-bg.png")} alt="" />
+        <div ref={bgRef} className={`splash-bg${live ? " is-live" : ""}`} aria-hidden>
+          <img src={LANDING_POSTER} alt="" />
         </div>
         <div className="splash-body">
           <h1>
-            Connect with the
-            <br />
-            World
+            <span className="splash-copy splash-copy-1">
+              Connect with the
+              <br />
+              World
+            </span>
           </h1>
           <p className="lead">
-            Experience premium 1-on-1 video chats. Meet fascinating people in an exclusive, high-end digital LiveGirl designed for genuine connection.
-          </p>
-          <button
-            className="btn-primary press"
-            type="button"
-            disabled={entering}
-            aria-busy={entering}
-            onClick={() => setEntering(true)}
-          >
-            Get Started
-            <span className="icon-box" style={{ width: 16, height: 16 }}>
-              <img className="icon" src={publicUrl("/icons/arrow.svg")} alt="" />
+            <span className="splash-copy splash-copy-2">
+              Experience premium 1-on-1 video chats. Meet fascinating people in an exclusive, high-end digital LiveGirl designed for genuine connection.
             </span>
-          </button>
-          <p className="legal">
-            By continuing, you agree to our{" "}
-            <button type="button" onClick={() => navigate("/legal/terms")}>
-              Terms of Use
-            </button>
-            ,{" "}
-            <button type="button" onClick={() => navigate("/legal/privacy")}>
-              Privacy Policy
-            </button>
-            , and{" "}
-            <button type="button" onClick={() => navigate("/legal/license")}>
-              User License Agreement
-            </button>
-            .
           </p>
-        </div>
-        {entering ? (
-          <div className="splash-loading" role="status" aria-live="polite" aria-label="Loading">
-            <span className="pay-spinner" />
+          <div className="splash-cta">
+            <button className="btn-primary press" type="button" disabled={leaving} onClick={onContinue}>
+              Continue
+            </button>
           </div>
-        ) : null}
+        </div>
       </div>
     </FullscreenShell>
   );
