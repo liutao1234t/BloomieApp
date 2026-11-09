@@ -2,11 +2,20 @@
  * H5 account API. UI must not call this; go through appStore.
  * Login without userId creates a server user. Always reuse the local userId
  * on the same phone so Get Started does not register again.
+ * After the local coin balance changes, report userid + remaincoin.
+ * After the user rates the app, report userid + ratestatus so the user row updates.
+ * A failed report must not roll back coins or block the page.
  */
+
+import { h5AppClient } from "./appClient";
+import type { IapType } from "./iap";
 
 const DEFAULT_H5_API_BASE = "https://huinongyunchuang.cn";
 const LOGIN_TIMEOUT_MS = 8000;
 const PURCHASE_TIMEOUT_MS = 8000;
+const COIN_TIMEOUT_MS = 8000;
+const RATE_TIMEOUT_MS = 8000;
+const BEHAVIOR_TIMEOUT_MS = 8000;
 
 export type H5LoginResult = {
   userId: string;
@@ -95,6 +104,12 @@ function parsePurchase(raw: Envelope | null): H5PurchaseResult | null {
   return { purchaseId, userId, iapId, amount };
 }
 
+function deviceLanguage(): string {
+  if (typeof navigator === "undefined") return "";
+  const tag = (navigator.language || navigator.languages?.[0] || "").trim();
+  return tag.slice(0, 64);
+}
+
 let loginJob: Promise<H5LoginResult | null> | null = null;
 
 /**
@@ -104,7 +119,11 @@ let loginJob: Promise<H5LoginResult | null> | null = null;
 export function loginH5User(userId: string | null): Promise<H5LoginResult | null> {
   if (loginJob) return loginJob;
   loginJob = (async () => {
-    const body = userId ? { userId } : {};
+    const body = {
+      ...(userId ? { userId } : {}),
+      ...h5AppClient(),
+      deviceLang: deviceLanguage(),
+    };
     return parseLogin(await postJson("/api/v2/login", body, LOGIN_TIMEOUT_MS));
   })().finally(() => {
     loginJob = null;
@@ -112,16 +131,190 @@ export function loginH5User(userId: string | null): Promise<H5LoginResult | null
   return loginJob;
 }
 
+export type H5CoinChangeInput = {
+  userid: string;
+  remaincoin: number;
+};
+
+let pendingCoin: H5CoinChangeInput | null = null;
+let coinFlight: Promise<void> | null = null;
+
+function normalizeRemain(remaincoin: number) {
+  const remain = Math.floor(Number(remaincoin));
+  return Number.isFinite(remain) ? remain : null;
+}
+
+async function postCoinChange(input: H5CoinChangeInput): Promise<boolean> {
+  const remaincoin = normalizeRemain(input.remaincoin);
+  if (!input.userid || remaincoin == null) return false;
+  const raw = await postJson(
+    "/api/v2/coinchange",
+    { userid: input.userid, remaincoin, ...h5AppClient() },
+    COIN_TIMEOUT_MS,
+  );
+  return Boolean(raw && raw.code === 0);
+}
+
+async function drainCoinChanges() {
+  while (pendingCoin) {
+    const snap = pendingCoin;
+    pendingCoin = null;
+    const ok = await postCoinChange(snap);
+    if (ok || pendingCoin) continue;
+    const login = await loginH5User(snap.userid);
+    if (pendingCoin) continue;
+    await postCoinChange({ userid: login?.userId || snap.userid, remaincoin: snap.remaincoin });
+  }
+}
+
+function kickCoinDrain() {
+  if (coinFlight) return;
+  coinFlight = drainCoinChanges().finally(() => {
+    coinFlight = null;
+    if (pendingCoin) kickCoinDrain();
+  });
+}
+
+export type H5RateStatusInput = {
+  userid: string;
+  /** 1 = the user has rated the app. Written onto that user's row. */
+  ratestatus: 1;
+};
+
+async function postRateStatus(input: H5RateStatusInput): Promise<boolean> {
+  if (!input.userid) return false;
+  const raw = await postJson(
+    "/api/v2/ratestatus",
+    { userid: input.userid, ratestatus: 1, ...h5AppClient() },
+    RATE_TIMEOUT_MS,
+  );
+  return Boolean(raw && raw.code === 0);
+}
+
+/** Mark this user as rated. Failure must not undo the local reward. */
+export function reportH5RateStatus(input: H5RateStatusInput): void {
+  const userid = input.userid.trim();
+  if (!userid) return;
+  void (async () => {
+    if (await postRateStatus({ userid, ratestatus: 1 })) return;
+    const login = await loginH5User(userid);
+    await postRateStatus({ userid: login?.userId || userid, ratestatus: 1 });
+  })();
+}
+
+export type H5UserBehaviorInput = {
+  userid: string;
+  LoginDays: number;
+  viewHostProfileCount: number;
+  PaidCalledHostCount: number;
+  PaidCalledTotalTime: number;
+  FreeCalledHostCount: number;
+  FreeCalledTotalTime: number;
+  LiveHubLiveRoomJoinCount: number;
+  LiveHubLiveWatchTotalTime: number;
+};
+
+let pendingBehavior: H5UserBehaviorInput | null = null;
+let behaviorFlight: Promise<void> | null = null;
+
+function wholeCount(value: number) {
+  const count = Math.floor(Number(value));
+  return Number.isFinite(count) && count >= 0 ? count : null;
+}
+
+function normalizeBehaviorReport(input: H5UserBehaviorInput): H5UserBehaviorInput | null {
+  const userid = input.userid.trim();
+  const LoginDays = wholeCount(input.LoginDays);
+  const viewHostProfileCount = wholeCount(input.viewHostProfileCount);
+  const PaidCalledHostCount = wholeCount(input.PaidCalledHostCount);
+  const PaidCalledTotalTime = wholeCount(input.PaidCalledTotalTime);
+  const FreeCalledHostCount = wholeCount(input.FreeCalledHostCount);
+  const FreeCalledTotalTime = wholeCount(input.FreeCalledTotalTime);
+  const LiveHubLiveRoomJoinCount = wholeCount(input.LiveHubLiveRoomJoinCount);
+  const LiveHubLiveWatchTotalTime = wholeCount(input.LiveHubLiveWatchTotalTime);
+  if (
+    !userid ||
+    LoginDays == null ||
+    viewHostProfileCount == null ||
+    PaidCalledHostCount == null ||
+    PaidCalledTotalTime == null ||
+    FreeCalledHostCount == null ||
+    FreeCalledTotalTime == null ||
+    LiveHubLiveRoomJoinCount == null ||
+    LiveHubLiveWatchTotalTime == null
+  ) {
+    return null;
+  }
+  return {
+    userid,
+    LoginDays,
+    viewHostProfileCount,
+    PaidCalledHostCount,
+    PaidCalledTotalTime,
+    FreeCalledHostCount,
+    FreeCalledTotalTime,
+    LiveHubLiveRoomJoinCount,
+    LiveHubLiveWatchTotalTime,
+  };
+}
+
+async function postUserBehavior(input: H5UserBehaviorInput): Promise<boolean> {
+  const raw = await postJson(
+    "/api/v2/userBehavior",
+    { ...input, ...h5AppClient() },
+    BEHAVIOR_TIMEOUT_MS,
+  );
+  return Boolean(raw && raw.code === 0);
+}
+
+async function drainUserBehavior() {
+  while (pendingBehavior) {
+    const snap = pendingBehavior;
+    pendingBehavior = null;
+    const ok = await postUserBehavior(snap);
+    if (ok || pendingBehavior) continue;
+    const login = await loginH5User(snap.userid);
+    if (pendingBehavior) continue;
+    await postUserBehavior({ ...snap, userid: login?.userId || snap.userid });
+  }
+}
+
+function kickBehaviorDrain() {
+  if (behaviorFlight) return;
+  behaviorFlight = drainUserBehavior().finally(() => {
+    behaviorFlight = null;
+    if (pendingBehavior) kickBehaviorDrain();
+  });
+}
+
+/** Latest totals win if several actions happen before the request returns. */
+export function reportH5UserBehavior(input: H5UserBehaviorInput): void {
+  const next = normalizeBehaviorReport(input);
+  if (!next) return;
+  pendingBehavior = next;
+  kickBehaviorDrain();
+}
+
+/** Latest remaining balance wins if several changes happen before the request returns. */
+export function reportH5CoinChange(input: H5CoinChangeInput): void {
+  const remaincoin = normalizeRemain(input.remaincoin);
+  if (!input.userid || remaincoin == null) return;
+  pendingCoin = { userid: input.userid, remaincoin };
+  kickCoinDrain();
+}
+
 export async function reportH5Purchase(input: {
   userId: string;
   iapId: string;
   amount: string;
+  /** Which H5 button started this purchase. Same StoreKit id can be coins, reward3, livehub, or vip. */
+  type: IapType;
 }): Promise<H5PurchaseResult | null> {
-  if (!input.userId || !input.iapId) return null;
+  if (!input.userId || !input.iapId || !input.type) return null;
   const first = parsePurchase(
     await postJson(
       "/api/v2/purchase",
-      { userId: input.userId, iapId: input.iapId, amount: input.amount },
+      { userId: input.userId, iapId: input.iapId, amount: input.amount, type: input.type, ...h5AppClient() },
       PURCHASE_TIMEOUT_MS,
     ),
   );
@@ -132,7 +325,7 @@ export async function reportH5Purchase(input: {
   return parsePurchase(
     await postJson(
       "/api/v2/purchase",
-      { userId, iapId: input.iapId, amount: input.amount },
+      { userId, iapId: input.iapId, amount: input.amount, type: input.type, ...h5AppClient() },
       PURCHASE_TIMEOUT_MS,
     ),
   );

@@ -1,3 +1,4 @@
+import { LiveHubFab } from "./LiveHubPage";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { type Girl } from "../data/girls";
@@ -77,6 +78,9 @@ export function HomePage() {
   const navigate = useNavigate();
   const hosts = useHostsStore((s) => s.hosts);
   const refreshHosts = useHostsStore((s) => s.refreshHosts);
+  const showLiveHub = useAppStore((s) => s.hasPaid || (
+    !!s.registeredAt && !!s.loginAt && s.loginAt - s.registeredAt > 24 * 60 * 60 * 1000
+  ));
   const calledGirlIds = useAppStore((s) => s.calledGirlIds);
   const [cat, setCat] = useState<(typeof cats)[number]>("Hot");
   const [region, setRegion] = useState<(typeof regions)[number]>("Global");
@@ -86,6 +90,11 @@ export function HomePage() {
   }, [refreshHosts]);
 
   useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("livehub") === "1") {
+      url.searchParams.delete("livehub");
+      window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
+    }
     useAppStore.getState().offerWelcomeIfNeeded();
     useAppStore.getState().offerReward3IfDue();
   }, []);
@@ -109,49 +118,52 @@ export function HomePage() {
   }, [feed]);
 
   return (
-    <TabShell
-      onRefresh={() => refreshHosts({ force: true })}
-      header={
-        <>
-          <header className="home-header">
-            <h1 className="logo">LiveGirl</h1>
-            <OfferGiftButton />
-          </header>
-          <div className="chips">
-            {cats.map((c) => (
-              <button key={c} className={`chip press ${cat === c ? "is-on" : ""}`} onClick={() => setCat(c)}>
-                {c}
-              </button>
-            ))}
-          </div>
-          <div className="regions">
-            <span className="icon-box" style={{ width: 20, height: 20 }}>
-              <img className="icon" src={publicUrl("/icons/filter.svg")} alt="" />
-            </span>
-            {regions.map((r) => (
-              <button key={r} className={`region press ${region === r ? "is-on" : ""}`} onClick={() => setRegion(r)}>
-                {r}
-              </button>
-            ))}
-          </div>
-        </>
-      }
-    >
-      <div className="masonry">
-        {cols.map((col, colIdx) => (
-          <div key={colIdx} className="masonry-col">
-            {col.map(({ girl, tall }) => (
-              <Card
-                key={girl.id}
-                girl={girl}
-                tall={tall}
-                onOpen={() => navigate(`/profile/${girl.id}`)}
-                onCall={() => tryDial(girl.id, girl.ratePerMin, navigate)}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-    </TabShell>
+    <div className="home-root">
+      <TabShell
+        onRefresh={() => refreshHosts({ force: true })}
+        header={
+          <>
+            <header className="home-header">
+              <h1 className="logo">LiveGirl</h1>
+              <OfferGiftButton />
+            </header>
+            <div className="chips">
+              {cats.map((c) => (
+                <button key={c} className={`chip press ${cat === c ? "is-on" : ""}`} onClick={() => setCat(c)}>
+                  {c}
+                </button>
+              ))}
+            </div>
+            <div className="regions">
+              <span className="icon-box" style={{ width: 20, height: 20 }}>
+                <img className="icon" src={publicUrl("/icons/filter.svg")} alt="" />
+              </span>
+              {regions.map((r) => (
+                <button key={r} className={`region press ${region === r ? "is-on" : ""}`} onClick={() => setRegion(r)}>
+                  {r}
+                </button>
+              ))}
+            </div>
+          </>
+        }
+      >
+        <div className="masonry">
+          {cols.map((col, colIdx) => (
+            <div key={colIdx} className="masonry-col">
+              {col.map(({ girl, tall }) => (
+                <Card
+                  key={girl.id}
+                  girl={girl}
+                  tall={tall}
+                  onOpen={() => navigate(`/profile/${girl.id}`)}
+                  onCall={() => tryDial(girl.id, girl.ratePerMin, navigate)}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      </TabShell>
+      {showLiveHub && <LiveHubFab />}
+    </div>
   );
 }

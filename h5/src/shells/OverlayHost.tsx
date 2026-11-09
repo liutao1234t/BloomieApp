@@ -1,11 +1,12 @@
 import { useEffect, useState, type AnimationEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { getGirl } from "../data/girls";
-import { IAP_NEWBIE, IAP_REWARD3 } from "../data/iap";
+import { newbieIap, reward3Iap } from "../data/iap";
 import { gifts } from "../data/shop";
-import { APP_STORE_REVIEW_URL } from "../lib/nativeShare";
+import { appStoreReviewUrl } from "../lib/nativeShare";
 import { openCoinShop } from "../lib/paywall";
 import { CoinPackGrid } from "../pages/CoinPacks";
+import { LiveHubUnlock } from "../pages/LiveHubPage";
 import {
   CHECKIN_BONUS,
   CHECKIN_REWARD,
@@ -50,7 +51,7 @@ export function OverlayHost() {
 
   useEffect(() => {
     if (phase !== "out" || !shown) return;
-    const ms = shown === "gift" || shown === "coins" ? 280 : shown === "newMsg" ? 220 : 400;
+    const ms = shown === "livehub" ? 0 : shown === "gift" || shown === "coins" ? 280 : shown === "newMsg" ? 220 : 400;
     const t = window.setTimeout(() => setShown(null), ms);
     return () => window.clearTimeout(t);
   }, [phase, shown]);
@@ -85,6 +86,7 @@ export function OverlayHost() {
   const leaving = phase === "out";
   const isSheet = shown === "gift" || shown === "coins";
   const isBanner = shown === "newMsg";
+  const isLiveHub = shown === "livehub";
 
   return (
     <>
@@ -92,8 +94,9 @@ export function OverlayHost() {
         <div className="overlay-root" />
       ) : (
     <div className={`overlay-root${isBanner ? " is-toast" : " is-open"}${isSheet ? " is-sheet" : ""}${leaving ? " is-leaving" : ""}`}>
-      {isBanner ? null : <button className="overlay-mask" aria-label="Close" onClick={leaving ? undefined : close} />}
-      {isSheet ? (
+      {isLiveHub ? <LiveHubUnlock /> : null}
+      {isBanner || isLiveHub ? null : <button className="overlay-mask" aria-label="Close" onClick={leaving ? undefined : close} />}
+      {isLiveHub ? null : isSheet ? (
         <div className={`overlay-sheet ${leaving ? "is-out" : "is-in"}`} onAnimationEnd={onStageEnd}>
           {shown === "gift" ? <GiftSheet /> : null}
           {shown === "coins" ? <CoinsSheet /> : null}
@@ -562,7 +565,7 @@ function Reward3Card() {
 
   const onBuy = () => {
     if (payBusy) return;
-    startPurchase(IAP_REWARD3, () => {
+    startPurchase(reward3Iap(), () => {
       buyReward3();
       close();
     });
@@ -612,7 +615,7 @@ function PromoCard() {
       navigate("/coins");
       return;
     }
-    startPurchase(IAP_NEWBIE, () => {
+    startPurchase(newbieIap(), () => {
       buyNewbieOffer();
       close();
     });
@@ -771,7 +774,7 @@ function RateCard() {
           <>
             <a
               className="btn-primary press"
-              href={APP_STORE_REVIEW_URL}
+              href={appStoreReviewUrl()}
               onClick={() => {
                 window.setTimeout(() => useAppStore.getState().claimRate(), 400);
               }}

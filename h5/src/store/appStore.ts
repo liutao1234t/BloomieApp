@@ -12,7 +12,7 @@ import {
 import { type ChatMsg } from "../data/messages";
 import type { IapRequest } from "../data/iap";
 import { gifts, NEWBIE_COINS } from "../data/shop";
-import { loginH5User, reportH5Purchase } from "../data/h5AccountRepo";
+import { loginH5User, reportH5CoinChange, reportH5Purchase, reportH5RateStatus, reportH5UserBehavior } from "../data/h5AccountRepo";
 import {
   consumeStarter,
   freshDeviceNewbie,
@@ -50,6 +50,7 @@ export type OverlayId =
   | "confirmLogout"
   | "confirmDelete"
   | "insufficient"
+  | "livehub"
   | null;
 
 export type BillRow = {
@@ -188,6 +189,76 @@ function shouldPromptNewMessage(overlay: OverlayId, activeCall: ActiveCall | nul
 
 type Threads = Record<string, ChatMsg[]>;
 
+export type UserBehavior = {
+  loginDays: number;
+  lastLoginDay: string | null;
+  viewedProfileHostIds: string[];
+  paidCalledHostIds: string[];
+  paidCalledTotalSec: number;
+  freeCalledHostIds: string[];
+  freeCalledTotalSec: number;
+  liveHubRoomIds: string[];
+  liveHubWatchTotalSec: number;
+};
+
+function emptyBehavior(): UserBehavior {
+  return {
+    loginDays: 0,
+    lastLoginDay: null,
+    viewedProfileHostIds: [],
+    paidCalledHostIds: [],
+    paidCalledTotalSec: 0,
+    freeCalledHostIds: [],
+    freeCalledTotalSec: 0,
+    liveHubRoomIds: [],
+    liveHubWatchTotalSec: 0,
+  };
+}
+
+function idList(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  const ids = value.filter((item) => typeof item === "string" && item.trim()).map((item) => item.trim());
+  return [...new Set(ids)];
+}
+
+function countOf(value: unknown) {
+  const count = Math.floor(Number(value));
+  return Number.isFinite(count) && count >= 0 ? count : 0;
+}
+
+export function normalizeUserBehavior(value: unknown): UserBehavior {
+  const raw = value && typeof value === "object" ? (value as Partial<UserBehavior>) : {};
+  return {
+    loginDays: countOf(raw.loginDays),
+    lastLoginDay: typeof raw.lastLoginDay === "string" && raw.lastLoginDay.trim() ? raw.lastLoginDay : null,
+    viewedProfileHostIds: idList(raw.viewedProfileHostIds),
+    paidCalledHostIds: idList(raw.paidCalledHostIds),
+    paidCalledTotalSec: countOf(raw.paidCalledTotalSec),
+    freeCalledHostIds: idList(raw.freeCalledHostIds),
+    freeCalledTotalSec: countOf(raw.freeCalledTotalSec),
+    liveHubRoomIds: idList(raw.liveHubRoomIds),
+    liveHubWatchTotalSec: countOf(raw.liveHubWatchTotalSec),
+  };
+}
+
+function withHost(ids: string[], id: string) {
+  return ids.includes(id) ? ids : [...ids, id];
+}
+
+function behaviorAfterCall(behavior: UserBehavior, call: ActiveCall | null, girlId: string, durationSec: number) {
+  if (!call || call.girlId !== girlId) return behavior;
+  const sec = Math.max(0, Math.floor(durationSec));
+  if (call.isFree) {
+    const freeCalledHostIds = withHost(behavior.freeCalledHostIds, girlId);
+    if (freeCalledHostIds === behavior.freeCalledHostIds && sec === 0) return behavior;
+    return { ...behavior, freeCalledHostIds, freeCalledTotalSec: behavior.freeCalledTotalSec + sec };
+  }
+  if (call.isPass || call.ratePerMin <= 0) return behavior;
+  const paidCalledHostIds = withHost(behavior.paidCalledHostIds, girlId);
+  if (paidCalledHostIds === behavior.paidCalledHostIds && sec === 0) return behavior;
+  return { ...behavior, paidCalledHostIds, paidCalledTotalSec: behavior.paidCalledTotalSec + sec };
+}
+
 type AppState = {
   userId: string | null;
   accessToken: string | null;
@@ -197,7 +268,9 @@ type AppState = {
   hasPaid: boolean;
   boughtNewbieOffer: boolean;
   registeredAt: number | null;
+  loginAt: number | null;
   reward3Until: number | null;
+  liveHubUnlocked: boolean;
   seenSplash: boolean;
   seenWelcome: boolean;
   toast: string | null;
@@ -221,6 +294,7 @@ type AppState = {
   lastFreeCallDate: string | null;
   calledGirlIds: string[];
   viewedHostIds: string[];
+  behavior: UserBehavior;
   activeCall: ActiveCall | null;
   supportMessages: SupportMsg[];
   supportBusy: boolean;
@@ -245,6 +319,7 @@ type AppState = {
   buyCoins: (n: number, title: string) => void;
   buyNewbieOffer: () => void;
   buyReward3: () => void;
+  buyLiveHub: () => void;
   offerReward3IfDue: () => void;
   offerWelcomeIfNeeded: () => void;
   startPurchase: (request: IapRequest, apply: () => void) => void;
@@ -254,6 +329,9 @@ type AppState = {
   claimDaily: () => void;
   claimRate: () => void;
   claimWelcome: () => void;
+  noteViewedProfileHost: (hostId: string) => void;
+  noteLiveHubJoin: (roomId: string) => void;
+  addLiveHubWatch: (seconds: number) => void;
 };
 
 const guestProfile: ProfileDraft = {
@@ -275,8 +353,10 @@ function blankProgress(userId: string | null) {
     isVip: false,
     hasPaid: false,
     boughtNewbieOffer: false,
+    loginAt: null as number | null,
     registeredAt: userId ? resolveRegisteredAt(userId) : null,
     reward3Until: null as number | null,
+    liveHubUnlocked: false,
     seenWelcome: false,
     toast: null as string | null,
     payBusy: false,
@@ -299,6 +379,7 @@ function blankProgress(userId: string | null) {
     lastFreeCallDate: null as string | null,
     calledGirlIds: [] as string[],
     viewedHostIds: [] as string[],
+    behavior: emptyBehavior(),
     activeCall: null as ActiveCall | null,
     supportMessages: [supportWelcomeMsg()],
     supportBusy: false,
@@ -311,6 +392,44 @@ let toastTimer: number | undefined;
 let paySeq = 0;
 let giftFxSeq = 0;
 let startSessionJob: Promise<void> | null = null;
+let coinReportArmed = false;
+let holdCoinReport = false;
+
+function publishCoinRemain(userId: string | null, remaincoin: number) {
+  if (!userId) return;
+  reportH5CoinChange({ userid: userId, remaincoin });
+}
+
+function publishBehavior(userId: string | null) {
+  if (!userId) return;
+  const behavior = normalizeUserBehavior(useAppStore.getState().behavior);
+  reportH5UserBehavior({
+    userid: userId,
+    LoginDays: behavior.loginDays,
+    viewHostProfileCount: behavior.viewedProfileHostIds.length,
+    PaidCalledHostCount: behavior.paidCalledHostIds.length,
+    PaidCalledTotalTime: behavior.paidCalledTotalSec,
+    FreeCalledHostCount: behavior.freeCalledHostIds.length,
+    FreeCalledTotalTime: behavior.freeCalledTotalSec,
+    LiveHubLiveRoomJoinCount: behavior.liveHubRoomIds.length,
+    LiveHubLiveWatchTotalTime: behavior.liveHubWatchTotalSec,
+  });
+}
+
+function recordLoginDay() {
+  const behavior = normalizeUserBehavior(useAppStore.getState().behavior);
+  const today = todayKey();
+  if (behavior.lastLoginDay === today) return;
+  useAppStore.setState({
+    behavior: { ...behavior, loginDays: behavior.loginDays + 1, lastLoginDay: today },
+  });
+  publishBehavior(useAppStore.getState().userId);
+}
+
+function publishRateStatus(userId: string | null) {
+  if (!userId) return;
+  reportH5RateStatus({ userid: userId, ratestatus: 1 });
+}
 
 function cancelHostReplies() {
   for (const id of Object.keys(hostReplyJob)) delete hostReplyJob[id];
@@ -495,7 +614,10 @@ export const useAppStore = create<AppState>()(
       finishCall: (girlId, durationSec, title) => {
         const call = get().activeCall;
         const spent = call?.girlId === girlId ? call.spent : 0;
+        const prevBehavior = normalizeUserBehavior(get().behavior);
+        const behavior = behaviorAfterCall(prevBehavior, call, girlId, durationSec);
         set({
+          behavior,
           activeCall: null,
           giftFx: null,
           lastCall: { girlId, durationSec: Math.max(0, durationSec), coinsSpent: spent },
@@ -504,37 +626,49 @@ export const useAppStore = create<AppState>()(
               ? [{ id: `${Date.now()}`, title, at: stamp(), amount: -spent, kind: "out" }, ...get().bills]
               : get().bills,
         });
+        if (behavior !== prevBehavior) publishBehavior(get().userId);
       },
       startSession: () => {
         if (startSessionJob) return startSessionJob;
         startSessionJob = (async () => {
+          const loginAt = Date.now();
           const existingId = get().userId;
           if (!existingId) {
             const localId = newUserId();
-            cancelHostReplies();
-            set({
-              ...applyDeviceNewbie(localId, get().deviceNewbie),
-              seenSplash: true,
-            });
-            rememberInboxPeople({});
-            void import("./sayHiStore").then((m) => m.resetSayHiSession());
-            void import("./incomingCallStore").then((m) => m.resetIncomingCallSession());
-            const login = await loginH5User(null);
-            const userId = login?.userId || localId;
-            set({
-              userId,
-              accessToken: login?.accessToken ?? null,
-              registeredAt: login?.createdAtMs ?? resolveRegisteredAt(userId),
-            });
+            const coinsBefore = get().coins;
+            holdCoinReport = true;
+            try {
+              cancelHostReplies();
+              set({
+                ...applyDeviceNewbie(localId, get().deviceNewbie),
+                seenSplash: true,
+                loginAt,
+              });
+              rememberInboxPeople({});
+              void import("./sayHiStore").then((m) => m.resetSayHiSession());
+              void import("./incomingCallStore").then((m) => m.resetIncomingCallSession());
+              const login = await loginH5User(null);
+              const userId = login?.userId || localId;
+              set({
+                userId,
+                accessToken: login?.accessToken ?? null,
+                registeredAt: login?.createdAtMs ?? resolveRegisteredAt(userId),
+              });
+              if (get().coins !== coinsBefore) publishCoinRemain(userId, get().coins);
+              recordLoginDay();
+            } finally {
+              holdCoinReport = false;
+            }
             return;
           }
 
-          set({ seenSplash: true });
+          set({ seenSplash: true, loginAt });
           const login = await loginH5User(existingId);
           set({
             accessToken: login?.accessToken ?? get().accessToken ?? null,
             registeredAt: login?.createdAtMs ?? get().registeredAt ?? resolveRegisteredAt(existingId),
           });
+          recordLoginDay();
         })().finally(() => {
           startSessionJob = null;
         });
@@ -589,6 +723,10 @@ export const useAppStore = create<AppState>()(
           hasPaid: true,
         });
       },
+      buyLiveHub: () => {
+        if (get().liveHubUnlocked) return;
+        set({ liveHubUnlocked: true, hasPaid: true });
+      },
       offerReward3IfDue: () => {
         const { overlay, payBusy, userId, registeredAt, reward3Until, activeCall } = get();
         if (reward3Until != null) return;
@@ -640,6 +778,7 @@ export const useAppStore = create<AppState>()(
                 userId,
                 iapId: request.productId,
                 amount: request.price,
+                type: request.type,
               });
             }
           } else {
@@ -810,6 +949,7 @@ export const useAppStore = create<AppState>()(
         if (get().ratedUs || get().deviceNewbie.ratedUs) return;
         get().addCoins(RATE_REWARD, "Rate Us");
         set({ ratedUs: true, deviceNewbie: { ...get().deviceNewbie, ratedUs: true } });
+        publishRateStatus(get().userId);
       },
       claimWelcome: () => {
         cancelWelcomePop();
@@ -818,6 +958,29 @@ export const useAppStore = create<AppState>()(
           overlay: null,
           deviceNewbie: { ...get().deviceNewbie, seenWelcome: true },
         });
+      },
+      noteViewedProfileHost: (hostId) => {
+        const id = hostId.trim();
+        if (!id) return;
+        const behavior = normalizeUserBehavior(get().behavior);
+        if (behavior.viewedProfileHostIds.includes(id)) return;
+        set({ behavior: { ...behavior, viewedProfileHostIds: [...behavior.viewedProfileHostIds, id] } });
+        publishBehavior(get().userId);
+      },
+      noteLiveHubJoin: (roomId) => {
+        const id = roomId.trim();
+        if (!id) return;
+        const behavior = normalizeUserBehavior(get().behavior);
+        if (behavior.liveHubRoomIds.includes(id)) return;
+        set({ behavior: { ...behavior, liveHubRoomIds: [...behavior.liveHubRoomIds, id] } });
+        publishBehavior(get().userId);
+      },
+      addLiveHubWatch: (seconds) => {
+        const add = Math.floor(seconds);
+        if (!Number.isFinite(add) || add <= 0) return;
+        const behavior = normalizeUserBehavior(get().behavior);
+        set({ behavior: { ...behavior, liveHubWatchTotalSec: behavior.liveHubWatchTotalSec + add } });
+        publishBehavior(get().userId);
       },
       submitAppleSupport: () => set({ appleSupportSubmitted: true }),
       clearAppleSupport: () => set({ appleSupportSubmitted: false }),
@@ -848,7 +1011,8 @@ export const useAppStore = create<AppState>()(
           payBusy: false,
           seenSplash: false,
           isVip: false,
-          hasPaid: false,
+          loginAt: null,
+          liveHubUnlocked: false,
           activeCall: null,
           supportBusy: false,
         });
@@ -865,7 +1029,9 @@ export const useAppStore = create<AppState>()(
         hasPaid: s.hasPaid,
         boughtNewbieOffer: s.boughtNewbieOffer,
         registeredAt: s.registeredAt,
+        loginAt: s.loginAt,
         reward3Until: s.reward3Until,
+        liveHubUnlocked: s.liveHubUnlocked,
         seenSplash: s.seenSplash,
         seenWelcome: s.seenWelcome,
         threads: s.threads,
@@ -884,10 +1050,14 @@ export const useAppStore = create<AppState>()(
         lastFreeCallDate: s.lastFreeCallDate,
         calledGirlIds: s.calledGirlIds,
         viewedHostIds: s.viewedHostIds,
+        behavior: s.behavior,
         supportMessages: s.supportMessages,
       }),
       onRehydrateStorage: () => (state) => {
-        if (!state) return;
+        if (!state) {
+          coinReportArmed = true;
+          return;
+        }
         if (!Array.isArray(state.followedIds)) {
           useAppStore.setState({ followedIds: [] });
         }
@@ -912,6 +1082,9 @@ export const useAppStore = create<AppState>()(
         if (typeof state.reward3Until !== "number") {
           useAppStore.setState({ reward3Until: null });
         }
+        if (typeof state.liveHubUnlocked !== "boolean") {
+          useAppStore.setState({ liveHubUnlocked: false });
+        }
         if (typeof state.seenWelcome !== "boolean") {
           useAppStore.setState({ seenWelcome: Boolean(state.userId) });
         }
@@ -934,11 +1107,13 @@ export const useAppStore = create<AppState>()(
         if (!Array.isArray(state.viewedHostIds)) {
           useAppStore.setState({ viewedHostIds: [] });
         }
+        useAppStore.setState({ behavior: normalizeUserBehavior(state.behavior) });
         if (state.userId) {
           void loginH5User(state.userId);
         }
+        coinReportArmed = true;
       },
-      version: 12,
+      version: 14,
       migrate: (persisted, fromVersion) => {
         const next = { ...(persisted as Record<string, unknown>) };
         if (fromVersion < 2) {
@@ -990,8 +1165,20 @@ export const useAppStore = create<AppState>()(
         if (fromVersion < 12) {
           next.deviceNewbie = inferDeviceNewbie(next, STARTING_COINS);
         }
+        if (fromVersion < 13) {
+          next.liveHubUnlocked = false;
+        }
+        if (fromVersion < 14) {
+          next.behavior = emptyBehavior();
+        }
         return next as typeof persisted;
       },
     },
   ),
 );
+
+useAppStore.subscribe((state, prev) => {
+  if (!coinReportArmed || holdCoinReport) return;
+  if (state.coins === prev.coins) return;
+  publishCoinRemain(state.userId || prev.userId, state.coins);
+});
